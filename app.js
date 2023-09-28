@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
+const chazaRouter = require('./routes/chazaRoutes');
 // const viewRouter = require('./routes/viewRoutes');
 
 
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
 // 3) ROUTES
 // app.use('/', viewRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/chazas', chazaRouter);
 
 
 app.all('*', (req, res, next) => {

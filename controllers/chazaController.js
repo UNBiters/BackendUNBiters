@@ -5,6 +5,7 @@ const factory = require('./handlerFactory');
 
 exports.getChaza = factory.getOne(Chaza);
 exports.getAllChazas = factory.getAll(Chaza);
+exports.createChaza = factory.createOne(Chaza);
 
 // Do NOT update passwords with this!
 exports.updateChaza = factory.updateOne(Chaza);

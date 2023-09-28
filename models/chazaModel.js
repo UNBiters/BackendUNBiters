@@ -11,7 +11,7 @@ const chazaSchema = new mongoose.Schema({
     slug: String,
     propietarios: {
         type: [{
-        type: moongose.Schema.ObjectId,
+        type: mongoose.Schema.ObjectId,
         ref: 'User'
         }],
         required: [true, "Toda chaza debe tener asociado un propietario."]
@@ -50,11 +50,11 @@ const chazaSchema = new mongoose.Schema({
     productos: [{
         nombre: {
             type: String,
-            required: [true, ""]
+            required: [true, "Todo producto debe tener un nombre"]
         },
         precio: {
             type: Number,
-            required: [true, ""]
+            required: [true, "Todo producto debe tener asociado un precio"]
         },
         descripcion: {
             type: String,
@@ -92,5 +92,5 @@ const chazaSchema = new mongoose.Schema({
 // Rating propiedad virtual
 // Reseñas virtual
 
-const Chaza = mongoose.model('Usuario', chazaSchema);
+const Chaza = mongoose.model('Chaza', chazaSchema);
 module.exports = Chaza;
