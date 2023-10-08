@@ -9,11 +9,11 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Por favor dino tu nombre!']
     },
     correo: {
-    type: String,
-    required: [true, 'Por favor dinos tu correo'],
-    unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, 'Por favor dinos tu correo valido']
+        type: String,
+        required: [true, 'Por favor dinos tu correo'],
+        unique: true,
+        lowercase: true,
+        validate: [validator.isEmail, 'Por favor dinos tu correo valido']
     },
     foto: {
         type: String,
@@ -71,3 +71,6 @@ userSchema.pre('save', function(next) {
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
+
+const User = mongoose.model('Usuario', userSchema);
+module.exports = User;
