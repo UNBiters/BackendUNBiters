@@ -1,6 +1,7 @@
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/apiFeatures');
+const searchController = require('./searchController');
 
 exports.deleteOne = Model =>
   catchAsync(async (req, res, next) => {
@@ -35,9 +36,12 @@ exports.updateOne = Model =>
     });
   });
 
-exports.createOne = Model =>
+exports.createOne = (Model, search=false) =>
   catchAsync(async (req, res, next) => {
+    console.log("HOLAAAA DESDE EL FACTORY")
     const doc = await Model.create(req.body);
+
+    if (search) searchController.uploadChaza([doc])
 
     res.status(201).json({
       status: 'success',
@@ -68,7 +72,6 @@ exports.getOne = (Model, popOptions) =>
 exports.getAll = Model =>
   catchAsync(async (req, res, next) => {
     let filter = {};
-
     const features = new APIFeatures(Model.find(filter), req.query)
       .filter()
       .sort()

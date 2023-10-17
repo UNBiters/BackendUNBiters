@@ -12,13 +12,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
+    "algoliasearch": "^4.20.0",
     "axios": "^1.5.1",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.3.1",
+    "epayco-sdk-node": "^1.2.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.0",
     "morgan": "^1.10.0",
+    "nodemailer": "^6.9.6",
     "slugify": "^1.6.6",
     "validator": "^13.11.0"
   },
