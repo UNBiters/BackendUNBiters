@@ -38,7 +38,6 @@ exports.updateOne = Model =>
 
 exports.createOne = (Model, search=false) =>
   catchAsync(async (req, res, next) => {
-    console.log("HOLAAAA DESDE EL FACTORY")
     const doc = await Model.create(req.body);
 
     if (search) searchController.uploadChaza([doc])
