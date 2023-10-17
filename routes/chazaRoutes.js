@@ -21,12 +21,12 @@ router.route('/publi-chazas').get(chazaController.chazasPubli, chazaController.g
 router
   .route('/')
   .get(chazaController.getAllChazas)
-  .post(chazaController.createChaza);
+  .post(authController.protect, authController.restrictTo('admin', 'chazaUser'), chazaController.createChaza);
 
 router
   .route('/:id')
   .get(chazaController.getChaza)
-  .patch(chazaController.updateChaza)
-  .delete(chazaController.deleteChaza);
+  .patch(authController.protect, authController.restrictTo('admin'), chazaController.updateChaza)
+  .delete(authController.protect, authController.restrictTo('admin'), chazaController.deleteChaza);
 
 module.exports = router;

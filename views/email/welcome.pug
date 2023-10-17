@@ -1,0 +1,17 @@
+extends baseEmail
+
+block content
+  p Hola #{firstName},
+  p Bienvenid@ a UNBiters, nos alegra tenerte. 🎉🙏
+  p Que esperas para conocer los alimentos mas deliciosos que ofrece la comunidad universitaria, ¡Asegurate de conocerlas todas las chazas disponibles en la U!
+  table.btn.btn-primary(role='presentation', border='0', cellpadding='0', cellspacing='0')
+    tbody
+      tr
+        td(align='left')
+          table(role='presentation', border='0', cellpadding='0', cellspacing='0')
+            tbody
+              tr
+                td
+                  a(href=`${url}`, target='_blank') Accede a tu perfil
+  p Aqui encontraras un mundo gastronómico como ningun otro. 
+  p - UNBiters (Gian Emanuel Morales Gonzalez, Andres Felipe Lopez Gutierrez, John Jairo Riano Martinez, David Stiven Poveda Taborda) CEO's
