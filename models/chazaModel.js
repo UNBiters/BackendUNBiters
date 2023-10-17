@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const slugify = require('slugify');
 
 const chazaSchema = new mongoose.Schema({
     nombre: {
@@ -74,6 +75,21 @@ const chazaSchema = new mongoose.Schema({
         type: String,
         default: "Bogotá"
     },
+    ratingsAverage: {
+        type: Number,
+        default: 4.5,
+        min: [1, 'La valoración debe estár por encima de 1.0'],
+        max: [5, 'La valoración debe estár por debajo de 5.0'],
+        set: val => Math.round(val * 10) / 10 // 4.666666, 46.6666, 47, 4.7
+    },
+    ratingsQuantity: {
+        type: Number,
+        default: 0
+    },
+    likes: {
+        type: Number,
+        default: 0
+    },
     ciudad: {
         type: String,
         default: "Bogotá"
@@ -87,10 +103,30 @@ const chazaSchema = new mongoose.Schema({
     etiquetas: [String],
     redesSociales: [String],
     paginaWeb: String
-}, {timestamps: true});
+},
+{
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    timestamps: true
+});
 
 // Rating propiedad virtual
 // Reseñas virtual
+
+// Virtual populate
+chazaSchema.virtual('reviews', {
+    ref: 'Review',
+    foreignField: 'chaza',
+    localField: '_id'
+  });
+  
+  // DOCUMENT MIDDLEWARE: runs before .save() and .create()
+  chazaSchema.pre('save', function(next) {
+    this.slug = slugify(this.nombre, { lower: true });
+    next();
+  });
+
+
 
 const Chaza = mongoose.model('Chaza', chazaSchema);
 module.exports = Chaza;
