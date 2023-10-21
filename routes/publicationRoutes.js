@@ -22,12 +22,18 @@ router
         publicationController.createPublication)
 
 
-router.route('/updateMyPublication/:id')
-.patch(
+router
+.route('/updateMyPublication/:id')
+    .patch(
     authController.protect, 
     publicationController.uploadPublicationImage,
     publicationController.resizePublicationImage,
     publicationController.updateMyPublication);
+
+router
+.route('/deleteMyPublication/:id')
+    .delete(authController.protect,  
+      publicationController.deleteMyPublication);
 
 router.use(authController.protect);
 router.use(authController.restrictTo('admin'));
@@ -35,7 +41,10 @@ router.use(authController.restrictTo('admin'));
 router
 .route('/:id')
     .get(publicationController.getPublication)
-    .patch(publicationController.updatePublication)
+    .patch(
+        publicationController.uploadPublicationImage,
+        publicationController.resizePublicationImage,
+        publicationController.updatePublication)
     .delete(publicationController.deletePublication);
 
 

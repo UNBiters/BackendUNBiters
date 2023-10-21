@@ -25,6 +25,10 @@ const publicationSchema = new mongoose.Schema(
         type: Number,
         default: 0
     },
+    numComentarios: {
+        type: Number,
+        default: 0
+    },
     rating: {
         type: Number,
         min: 1,

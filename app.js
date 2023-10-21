@@ -20,6 +20,7 @@ const likeRouter = require('./routes/likeRoutes');
 const subscribtionRouter = require('./routes/subscriptionRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const publicationRouter = require('./routes/publicationRoutes');
+const aboutusRouter = require('./routes/aboutusRouter');
 // const viewRouter = require('./routes/viewRoutes');
 
 
@@ -92,6 +93,7 @@ app.use('/api/v1/likes', likeRouter);
 app.use('/api/v1/subscribtions', subscribtionRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/publications', publicationRouter);
+app.use('/api/v1/aboutus', aboutusRouter);
 
 
 app.all('*', (req, res, next) => {

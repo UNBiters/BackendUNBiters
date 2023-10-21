@@ -73,3 +73,15 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
         }
     });
 });
+
+exports.deleteMyPublication = catchAsync(async (req, res, next) => {
+  const deletedPublication = await Publication.findByIdAndDelete(req.params.id);
+  if (!deletedPublication) {
+    return next(new AppError('No se encontro una publicación asociada a este usuario', 404));
+  }
+  
+  res.status(204).json({
+    status: 'success',
+    data: null
+  });
+})
