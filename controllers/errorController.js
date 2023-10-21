@@ -2,7 +2,6 @@ const AppError = require('./../utils/appError');
 // const mongoose = require('mongoose');
 
 const handleCastErrorDB = err => {
-  console.log("ENTROOO")
   const message = `Campo invalido en ${err.path}: ${err.value}.`;
   return new AppError(message, 400);
 };

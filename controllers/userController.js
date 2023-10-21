@@ -22,7 +22,7 @@ const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) {
     cb(null, true)
   } else {
-    cb(new AppError('No es una imagen! Por favor sube una imagen', 400), false);
+    cb(new AppError('El archivo no es una imagen! Por favor sube una imagen', 400), false);
   }
 };
 

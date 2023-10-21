@@ -10,7 +10,7 @@ router.use(authController.protect);
 router
   .route('/')
   .get(likeController.getAllLikes)
-  .post(authController.restrictTo('usuario'), likeController.setChazaUserIds, likeController.upsertLike);
+  .post(likeController.setPublicationUserIds, likeController.upsertLike);
 
 router
   .route('/:id')

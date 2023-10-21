@@ -7,7 +7,6 @@ const chazaSchema = new mongoose.Schema({
         required: [true, "Por favor dinos el nombre de tu chaza"],
         unique: true,
         trim: true,
-        maxlength: [10, 'El nombre de la chaza debe tener menos de x caracteres'],
     },
     slug: String,
     propietarios: {
@@ -127,20 +126,17 @@ const chazaSchema = new mongoose.Schema({
 // Reseñas virtual
 
 // Virtual populate
-chazaSchema.virtual('reviews', {
-    ref: 'Review',
+chazaSchema.virtual('publications', {
+    ref: 'Publication',
     foreignField: 'chaza',
     localField: '_id'
-  });
+});
   
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()
 chazaSchema.pre('save', function(next) {
     this.slug = slugify(this.nombre, { lower: true });
     next();
 });
-
-
-
 
 
 const Chaza = mongoose.model('Chaza', chazaSchema);

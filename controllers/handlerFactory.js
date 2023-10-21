@@ -43,6 +43,8 @@ exports.updateOne = Model =>
 
 exports.createOne = (Model, search=false) =>
   catchAsync(async (req, res, next) => {
+    if (req.file && Model.modelName == "Publication") req.body.imagen = req.file.filename;
+    console.log(req.body)
     const doc = await Model.create(req.body);
 
     if (search) searchController.uploadChaza([doc])

@@ -2,13 +2,12 @@ const express = require('express');
 const chazaController = require('./../controllers/chazaController');
 const authController = require('./../controllers/authController');
 const searchController = require('../controllers/searchController');
-const reviewRouter = require('./../routes/reviewRoutes');
 const likeRouter = require('./likeRoutes');
 
 const router = express.Router();
 
-router.use('/:chazaId/reviews', reviewRouter);
-router.use('/:chazaId/likes', likeRouter);
+// router.use('/:chazaId/reviews', reviewRouter);
+// router.use('/:chazaId/likes', likeRouter);
 
 // Hacer delete me, update me poner restriccion de administradores. 
 
@@ -19,7 +18,13 @@ router.route('/searchChaza').post(searchController.searchChaza);
 router.route('/publi-chazas').get(chazaController.chazasPubli, chazaController.getAllChazas);
 
 // Mi perfil de chaza:
-router.route('/myChaza').get(authController.protect, authController.restrictTo('chazaUser'), chazaController.getMyChazas);
+router
+  .route('/myChaza')
+  .get(
+    authController.protect, 
+    authController.restrictTo('chazaUser', 'admin'), 
+    chazaController.getMyChazas);
+
 router.route('/updateMyChaza/:id')
   .patch(
     authController.protect, 
@@ -27,12 +32,21 @@ router.route('/updateMyChaza/:id')
     chazaController.uploadChazaImages,
     chazaController.resizeChazaImages,
     chazaController.updateMyChaza);
-router.route('/deleteMyChaza/:id').delete(authController.protect, authController.restrictTo('chazaUser'), chazaController.deleteMyChaza);
+    
+router
+  .route('/deleteMyChaza/:id')
+  .delete(authController.protect, 
+    authController.restrictTo('chazaUser'), 
+    chazaController.deleteMyChaza);
 
 router
   .route('/')
   .get(chazaController.getAllChazas)
-  .post(authController.protect, authController.restrictTo('admin', 'chazaUser'), chazaController.setUserChaza, chazaController.createChaza);
+  .post(
+    authController.protect, 
+    authController.restrictTo('admin', 'chazaUser'), 
+    chazaController.setUserChaza, 
+    chazaController.createChaza);
 
 router
   .route('/:id')

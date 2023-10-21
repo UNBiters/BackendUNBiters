@@ -19,6 +19,7 @@ const chazaRouter = require('./routes/chazaRoutes');
 const likeRouter = require('./routes/likeRoutes');
 const subscribtionRouter = require('./routes/subscriptionRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const publicationRouter = require('./routes/publicationRoutes');
 // const viewRouter = require('./routes/viewRoutes');
 
 
@@ -90,6 +91,7 @@ app.use('/api/v1/chazas', chazaRouter);
 app.use('/api/v1/likes', likeRouter);
 app.use('/api/v1/subscribtions', subscribtionRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/publications', publicationRouter);
 
 
 app.all('*', (req, res, next) => {

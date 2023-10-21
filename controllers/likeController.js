@@ -3,9 +3,9 @@ const AppError = require('./../utils/appError');
 const factory = require('./handlerFactory');
 const Like = require('../models/likeModel');
 
-exports.setChazaUserIds = (req, res, next) => {
+exports.setPublicationUserIds = (req, res, next) => {
     // Allow nested routes
-    if (!req.body.chaza) req.body.chaza = req.params.chazaId;
+    if (!req.body.publication) req.body.publication = req.params.publicationId;
     if (!req.body.user) req.body.user = req.user.id;
 
     next();
