@@ -1,4 +1,3 @@
-// review / rating / createdAt / ref to tour / ref to user
 const mongoose = require('mongoose');
 const Chaza = require('./chazaModel');
 
@@ -6,7 +5,7 @@ const reviewSchema = new mongoose.Schema(
   {
     review: {
       type: String,
-      required: [true, 'Review can not be empty!']
+      required: [true, 'Por favor escribe un comentario antes de publicarlo']
     },
     rating: {
       type: Number,
@@ -17,15 +16,15 @@ const reviewSchema = new mongoose.Schema(
       type: Date,
       default: Date.now
     },
-    chaza: {
+    publication: {
       type: mongoose.Schema.ObjectId,
-      ref: 'Chaza',
-      // required: [true, 'La review debe estar asociada a una chaza']
+      ref: 'Publication',
+      required: [true, 'El comentario debe estar asociado a una publicación']
     },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
-      required: [true, 'La review debe pertencer a un usuario']
+      required: [true, 'El comentario debe estar asociado a un usuario']
     }
   },
   {
@@ -43,7 +42,6 @@ reviewSchema.pre(/^find/, function(next) {
 });
 
 reviewSchema.statics.calcAverageRatings = async function(chazaId) {
-  console.log("hola desde review")
   const stats = await this.aggregate([
     {
       $match: { chaza: chazaId }

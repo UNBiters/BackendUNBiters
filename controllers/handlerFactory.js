@@ -2,6 +2,7 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/apiFeatures');
 const searchController = require('./searchController');
+const slugify = require('slugify');
 
 exports.deleteOne = Model =>
   catchAsync(async (req, res, next) => {
@@ -26,6 +27,10 @@ exports.updateOne = Model =>
 
     if (!doc) {
       return next(new AppError('No document found with that ID', 404));
+    }
+  
+    if (req.body.nombre && Model.modelName == "Chaza") {
+      doc.slug = slugify(String(req.body.nombre), { lower: true });
     }
 
     res.status(200).json({

@@ -11,7 +11,7 @@ exports.setChazaUserIds = (req, res, next) => {
     next();
 };
 
-exports.upsert = catchAsync(async (req, res, next) => {
+exports.upsertLike = catchAsync(async (req, res, next) => {
     const userLike = await Like.findOneAndUpdate(req.body, [{$set: {"active": {$not: "$active"}}}], {upsert: true, new: true});
     res.status(200).json({
         status: 'success',

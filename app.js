@@ -41,7 +41,7 @@ app.options('*', cors());
 // Set security HTTP headers
 app.use(helmet());
 
-if (process.env.NODE_ENV = 'development') {
+if (process.env.NODE_ENV == 'development') {
   app.use(morgan('dev'));
 }
 
@@ -95,6 +95,7 @@ app.use('/api/v1/reviews', reviewRouter);
 app.all('*', (req, res, next) => {
   next(new AppError(`No se pudo encontrar ${req.originalUrl} en este servidor!`, 404));
 });
+
 
 app.use(globalErrorHandler);
 

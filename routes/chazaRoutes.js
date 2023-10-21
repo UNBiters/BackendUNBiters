@@ -19,7 +19,15 @@ router.route('/searchChaza').post(searchController.searchChaza);
 router.route('/publi-chazas').get(chazaController.chazasPubli, chazaController.getAllChazas);
 
 // Mi perfil de chaza:
-router.route('/mychaza').get(authController.protect, authController.restrictTo('chazaUser'), chazaController.getMyChaza)
+router.route('/myChaza').get(authController.protect, authController.restrictTo('chazaUser'), chazaController.getMyChazas);
+router.route('/updateMyChaza/:id')
+  .patch(
+    authController.protect, 
+    authController.restrictTo('chazaUser'), 
+    chazaController.uploadChazaImages,
+    chazaController.resizeChazaImages,
+    chazaController.updateMyChaza);
+router.route('/deleteMyChaza/:id').delete(authController.protect, authController.restrictTo('chazaUser'), chazaController.deleteMyChaza);
 
 router
   .route('/')
@@ -30,7 +38,13 @@ router
   .route('/:id')
   .get(chazaController.getChaza)
   .post(authController.protect, chazaController.followChaza)
-  .patch(authController.protect, authController.restrictTo('admin'), chazaController.updateChaza)
+  .patch(
+    authController.protect, 
+    authController.restrictTo('admin'),
+    // chazaController.uploadChazaImages,
+    // chazaController.resizeChazaImages, 
+    chazaController.updateChaza)
   .delete(authController.protect, authController.restrictTo('admin'), chazaController.deleteChaza);
+  
 
 module.exports = router;
