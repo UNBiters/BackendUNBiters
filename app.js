@@ -49,7 +49,7 @@ if (process.env.NODE_ENV = 'development') {
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: 'Superaste el máximo de request desde esta IP, vuelve a intentar en una hora!'
+  message: 'Superaste el máximo número de request desde esta IP, vuelve a intentar en una hora!'
 });
 app.use('/api', limiter);
 
@@ -64,18 +64,14 @@ app.use(mongoSanitize());
 app.use(xss());
 
 // Prevent parameter pollution
-// app.use(
-//   hpp({
-//     whitelist: [
-//       'duration',
-//       'ratingsQuantity',
-//       'ratingsAverage',
-//       'maxGroupSize',
-//       'difficulty',
-//       'price'
-//     ]
-//   })
-// );
+app.use(
+  hpp({
+    whitelist: [
+      'ratingsQuantity',
+      'ratingsAverage',
+    ]
+  })
+);
 
 app.use(compression());
 

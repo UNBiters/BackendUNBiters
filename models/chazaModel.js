@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 const slugify = require('slugify');
 
 const chazaSchema = new mongoose.Schema({
@@ -16,6 +15,16 @@ const chazaSchema = new mongoose.Schema({
         ref: 'User'
         }],
         required: [true, "Toda chaza debe tener asociado un propietario."]
+    },
+    seguidores: {
+        type: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+        }],
+    },
+    numSeguidores: {
+        type: Number,
+        default: 0
     },
     fechaFundacion: {
         type: Date
@@ -109,6 +118,9 @@ const chazaSchema = new mongoose.Schema({
     toObject: { virtuals: true },
     timestamps: true
 });
+
+
+
 
 // Rating propiedad virtual
 // Reseñas virtual

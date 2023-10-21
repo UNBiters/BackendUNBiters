@@ -1,7 +1,6 @@
 const algoliasearch = require('algoliasearch');
 const Chaza = require('../models/chazaModel');
 const catchAsync = require('./../utils/catchAsync');
-// const server = require('../server');
 
 // Connect and authenticate with your Algolia app
 const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_API_KEY);

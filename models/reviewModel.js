@@ -20,7 +20,7 @@ const reviewSchema = new mongoose.Schema(
     chaza: {
       type: mongoose.Schema.ObjectId,
       ref: 'Chaza',
-      required: [true, 'La review debe estar asociada a una chaza']
+      // required: [true, 'La review debe estar asociada a una chaza']
     },
     user: {
       type: mongoose.Schema.ObjectId,
@@ -33,8 +33,6 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true }
   }
 );
-
-reviewSchema.index({ chaza: 1, user: 1 });
 
 reviewSchema.pre(/^find/, function(next) {
   this.populate({

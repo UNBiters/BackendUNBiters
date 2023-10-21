@@ -18,14 +18,18 @@ router.route('/searchChaza').post(searchController.searchChaza);
 // Publicaciones:
 router.route('/publi-chazas').get(chazaController.chazasPubli, chazaController.getAllChazas);
 
+// Mi perfil de chaza:
+router.route('/mychaza').get(authController.protect, authController.restrictTo('chazaUser'), chazaController.getMyChaza)
+
 router
   .route('/')
   .get(chazaController.getAllChazas)
-  .post(authController.protect, authController.restrictTo('admin', 'chazaUser'), chazaController.createChaza);
+  .post(authController.protect, authController.restrictTo('admin', 'chazaUser'), chazaController.setUserChaza, chazaController.createChaza);
 
 router
   .route('/:id')
   .get(chazaController.getChaza)
+  .post(authController.protect, chazaController.followChaza)
   .patch(authController.protect, authController.restrictTo('admin'), chazaController.updateChaza)
   .delete(authController.protect, authController.restrictTo('admin'), chazaController.deleteChaza);
 

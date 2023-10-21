@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
         select: false
+    },
+    nivelSuscripcion: {
+      type: Number,
+      default: 0
     }
 }, {timestamps: true});
 

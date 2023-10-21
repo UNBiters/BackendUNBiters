@@ -18,17 +18,17 @@ router.patch('/updateMyPassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
 router.patch(
   '/updateMe',
-  // userController.uploadUserPhoto,
-  // userController.resizeUserPhoto,
+  userController.uploadUSerPhoto,
+  userController.resizeUserPhoto,
   userController.updateMe
 );
-router.delete('/deleteMe', userController.deleteMe);
+router.patch('/deleteMe', userController.deleteMe);
 
 router.use(authController.restrictTo('admin'));
 
 router
   .route('/')
-  .get(authController.protect, userController.getAllUsers)
+  .get(userController.getAllUsers)
   .post(userController.createUser);
 
 router
