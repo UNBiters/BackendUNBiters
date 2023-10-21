@@ -22,7 +22,7 @@ const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) {
     cb(null, true)
   } else {
-    cb(new AppError('No es una imagen! Por favor sube una imagen', 400), false);
+    cb(new AppError('El archivo no es una imagen! Por favor sube una imagen', 400), false);
   }
 };
 
@@ -33,19 +33,19 @@ const upload = multer({
 
 exports.uploadUSerPhoto = upload.single('foto');
 
-exports.resizeUserPhoto = (req, res, next) => {
+exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
-  sharp(req.file.buffer)
+  await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
-    .toFile(`public/img/users/user-${req.file.filename}`);
+    .toFile(`public/img/users/${req.file.filename}`);
 
   next(); 
-}
+});
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};

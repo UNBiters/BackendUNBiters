@@ -19,6 +19,7 @@ const chazaRouter = require('./routes/chazaRoutes');
 const likeRouter = require('./routes/likeRoutes');
 const subscribtionRouter = require('./routes/subscriptionRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const publicationRouter = require('./routes/publicationRoutes');
 // const viewRouter = require('./routes/viewRoutes');
 
 
@@ -41,7 +42,7 @@ app.options('*', cors());
 // Set security HTTP headers
 app.use(helmet());
 
-if (process.env.NODE_ENV = 'development') {
+if (process.env.NODE_ENV == 'development') {
   app.use(morgan('dev'));
 }
 
@@ -90,11 +91,13 @@ app.use('/api/v1/chazas', chazaRouter);
 app.use('/api/v1/likes', likeRouter);
 app.use('/api/v1/subscribtions', subscribtionRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/publications', publicationRouter);
 
 
 app.all('*', (req, res, next) => {
   next(new AppError(`No se pudo encontrar ${req.originalUrl} en este servidor!`, 404));
 });
+
 
 app.use(globalErrorHandler);
 

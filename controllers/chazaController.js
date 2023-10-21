@@ -2,6 +2,104 @@ const Chaza = require('./../models/chazaModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const factory = require('./handlerFactory');
+const multer = require('multer');
+const sharp = require('sharp');
+const slugify = require('slugify');
+
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true)
+  } else {
+    cb(new AppError('No es una imagen! Por favor sube una imagen', 400), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+exports.uploadChazaImages = upload.fields([
+  {name: 'logo', maxCount: 1},
+  {name: 'fotos', maxCount: 3},
+  {name: 'banner', maxCount: 1}
+]);
+
+// upload.single('image') req.file
+// upload.array('images') req.files
+
+exports.resizeChazaImages = catchAsync(async (req, res, next) => {
+  // console.log(req.files);
+  if (!req.files.fotos || !req.files.banner || !req.files.logo) {
+    return next()
+  }
+  // Puede que un usuario tenga varias chazas.
+  const myChaza = await Chaza.findById(req.params.id);
+ 
+  if (!myChaza) {
+    return next(new AppError('No se encontro una chaza asociada a este usuario', 404));
+  }
+
+  // 1) Logos:
+
+  req.body.logo = `chaza-${myChaza.id}-${Date.now()}-logo.jpeg` 
+
+  await sharp(req.files.logo[0].buffer)
+      .resize(2000, 1333)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/chazas/${req.body.logo}`);
+
+  // Fotos:
+  req.body.fotos = []
+  await Promise.all(req.files.fotos.map(async (file, i) => {
+    const filename = `chaza-${myChaza.id}-${Date.now()}-${i + 1}.jpeg`;
+
+    await sharp(file.buffer)
+      .resize(2000, 1333)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/chazas/${filename}`);
+
+    req.body.fotos.push(filename)
+  }));
+
+
+  next()
+});
+
+exports.updateMyChaza = catchAsync(async (req, res, next) => {
+  const updatedChaza = await Chaza.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true});
+
+  if (!updatedChaza) {
+    return next(new AppError('No se encontro una chaza asociada a este usuario', 404));
+  }
+
+  if (req.body.nombre) {
+    updatedChaza.slug = slugify(req.body.nombre, { lower: true });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      updatedChaza
+    }
+  });
+});
+
+exports.deleteMyChaza = catchAsync(async (req, res, next) => {
+  const deletedChaza = await Chaza.findByIdAndDelete(req.params.id);
+  if (!deletedChaza) {
+    return next(new AppError('No se encontro una chaza asociada a este usuario', 404));
+  }
+  res.status(204).json({
+    status: 'success',
+    data: null
+  });
+});
+
 
 exports.chazasPubli = (req, res, next) => {
     req.query.sort = '-ratingsAverage';
@@ -56,8 +154,8 @@ exports.createChaza = factory.createOne(Chaza, true);
 exports.updateChaza = factory.updateOne(Chaza);
 exports.deleteChaza = factory.deleteOne(Chaza);
 
-exports.getMyChaza = catchAsync(async(req, res, next) => {
-  const myChaza = await Chaza.findOne({propietarios: req.user.id})
+exports.getMyChazas = catchAsync(async(req, res, next) => {
+  const myChaza = await Chaza.find({propietarios: req.user.id})
   if (!myChaza) {
     return next(
       new AppError(

@@ -4,9 +4,9 @@ const slugify = require('slugify');
 const chazaSchema = new mongoose.Schema({
     nombre: {
         type: String,
-        required: [true, "Por favor dinos el nombre de tu chaza."],
+        required: [true, "Por favor dinos el nombre de tu chaza"],
         unique: true,
-        trim: true
+        trim: true,
     },
     slug: String,
     propietarios: {
@@ -14,7 +14,7 @@ const chazaSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'User'
         }],
-        required: [true, "Toda chaza debe tener asociado un propietario."]
+        required: [true, "Toda chaza debe tener asociado un propietario"]
     },
     seguidores: {
         type: [{
@@ -31,17 +31,17 @@ const chazaSchema = new mongoose.Schema({
     },
     categorias: {
         type: [String],
-        required: [true, "Toda chaza debe pertenecer a alguna categoria."]
+        required: [true, "Toda chaza debe pertenecer a alguna categoria"]
     },
     descripcion: {    
         type: String,
-        maxlength: [200, "Por favor danos una descripción con máximo 200 caracteres."]
+        maxlength: [2, "Por favor danos una descripción con máximo 200 caracteres"]
     },
     ubicacion: {
         type: String,
-        required: [true, "Por favor dinos la localización de tu chaza."],
+        required: [true, "Por favor dinos la localización de tu chaza"],
         trim: true,
-        maxlength: [50, "Dinos tu localización en menos de 30 caracteres."]
+        maxlength: [50, "Dinos tu localización en menos de 30 caracteres"]
     },
     logo: {
         type: String
@@ -51,11 +51,11 @@ const chazaSchema = new mongoose.Schema({
     },
     nequi: {
         type: Boolean,
-        required: [true, "Dinos si nequi es uno de tus métodos de pago."]
+        required: [true, "Dinos si nequi es uno de tus métodos de pago"]
     },
     daviplata: {
         type: Boolean,
-        required: [true, "Dinos si daviplata es uno de tus métodos de pago."]
+        required: [true, "Dinos si daviplata es uno de tus métodos de pago"]
     },
     productos: [{
         nombre: {
@@ -68,13 +68,13 @@ const chazaSchema = new mongoose.Schema({
         },
         descripcion: {
             type: String,
-            maxlength: [180, "Describe tu producto en menos de 180 caracteres."]
+            maxlength: [180, "Describe tu producto en menos de 180 caracteres"]
         },
         fotos: [String] 
     }],
     horarioAtencion: {
         type: [String],
-        required: [true, "Por favor dinos tu horario de atención."]
+        required: [true, "Por favor dinos tu horario de atención"]
     },
     universidad: {
         type: String,
@@ -126,18 +126,17 @@ const chazaSchema = new mongoose.Schema({
 // Reseñas virtual
 
 // Virtual populate
-chazaSchema.virtual('reviews', {
-    ref: 'Review',
+chazaSchema.virtual('publications', {
+    ref: 'Publication',
     foreignField: 'chaza',
     localField: '_id'
-  });
+});
   
-  // DOCUMENT MIDDLEWARE: runs before .save() and .create()
-  chazaSchema.pre('save', function(next) {
+// DOCUMENT MIDDLEWARE: runs before .save() and .create()
+chazaSchema.pre('save', function(next) {
     this.slug = slugify(this.nombre, { lower: true });
     next();
-  });
-
+});
 
 
 const Chaza = mongoose.model('Chaza', chazaSchema);

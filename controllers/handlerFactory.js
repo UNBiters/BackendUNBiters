@@ -2,6 +2,7 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/apiFeatures');
 const searchController = require('./searchController');
+const slugify = require('slugify');
 
 exports.deleteOne = Model =>
   catchAsync(async (req, res, next) => {
@@ -27,6 +28,10 @@ exports.updateOne = Model =>
     if (!doc) {
       return next(new AppError('No document found with that ID', 404));
     }
+  
+    if (req.body.nombre && Model.modelName == "Chaza") {
+      doc.slug = slugify(String(req.body.nombre), { lower: true });
+    }
 
     res.status(200).json({
       status: 'success',
@@ -38,6 +43,8 @@ exports.updateOne = Model =>
 
 exports.createOne = (Model, search=false) =>
   catchAsync(async (req, res, next) => {
+    if (req.file && Model.modelName == "Publication") req.body.imagen = req.file.filename;
+    console.log(req.body)
     const doc = await Model.create(req.body);
 
     if (search) searchController.uploadChaza([doc])
