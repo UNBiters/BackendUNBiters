@@ -53,7 +53,7 @@ const limiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   message: 'Superaste el máximo número de request desde esta IP, vuelve a intentar en una hora!'
 });
-app.use('/api', limiter);
+//app.use('/api', limiter);
 
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));

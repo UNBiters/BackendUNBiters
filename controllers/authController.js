@@ -43,7 +43,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     correo: req.body.correo,
     contraseña: req.body.contraseña,
     confirmarContraseña: req.body.confirmarContraseña,
-    chaza: req.body.chaza
+    chaza: req.body.chaza,
+    rol: req.body.chaza === true ? "chazaUser" : "usuario"
   });
 
   const url = `${req.protocol}://${req.get('host')}/me`;
@@ -176,11 +177,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError('No existe ningún usuario asociado a ese correo', 404));
   }
-  
+
   // 2) Generate the random reset token
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
-  
+
   // 3) Send it to user's email
   try {
     const resetURL = `${req.protocol}://${req.get(
@@ -189,12 +190,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     // await new Email(user, resetURL).sendPasswordReset();
 
     const message = `¿Olvidaste tu contraseña? Actualiza tu contraseña en el siguiente link: ${resetURL}\nSi aun recuerdas tu contraseña, por favor ignora este correo!`;
-    
+
     const subject = "Tu token para actualizar tu contraseña (valido por 10 min)";
 
     await Email.sendEmail(
       user,
-      subject, 
+      subject,
       message,
       resetURL,
       "passwordReset"
