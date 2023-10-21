@@ -1,1 +1,2 @@
 En el try catch el argumento del catch es err asi que => err.resonse.data
+Ver foto de perfil del about us

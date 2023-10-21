@@ -111,10 +111,12 @@ publicationSchema.post('save', function() {
 //     next();
 // });
 
-publicationSchema.post(/^findOneAnd/, async function(doc) {
+publicationSchema.post(/^findOneAnd/, async function(doc, next) {
     // await this.findOne(); does NOT work here, query has already executed
+    if (!doc) return next()
     await doc.constructor.calcAverageRatings(doc.chaza);
 });
+
 
 const Publication = mongoose.model('Publication', publicationSchema);
 

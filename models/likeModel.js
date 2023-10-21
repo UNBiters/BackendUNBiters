@@ -25,7 +25,7 @@ const likeSchema = new mongoose.Schema({
 }, {timestamps: true});
 
 
-likeSchema.index({ user: 1, publication: 1 }, { unique: true });
+// likeSchema.index({ user: 1, publication: 1 }, { unique: true });
 
 likeSchema.statics.calcLikes = async function(publicationId) {
   

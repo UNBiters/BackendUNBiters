@@ -146,7 +146,7 @@ exports.followChaza = catchAsync(async (req, res, next) => {
     });
 })
 
-exports.getChaza = factory.getOne(Chaza, { path: 'reviews' });
+exports.getChaza = factory.getOne(Chaza, { path: 'publications' });
 exports.getAllChazas = factory.getAll(Chaza);
 exports.createChaza = factory.createOne(Chaza, true);
 

@@ -120,11 +120,6 @@ const chazaSchema = new mongoose.Schema({
 });
 
 
-
-
-// Rating propiedad virtual
-// Reseñas virtual
-
 // Virtual populate
 chazaSchema.virtual('publications', {
     ref: 'Publication',
