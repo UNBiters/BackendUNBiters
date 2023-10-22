@@ -28,7 +28,7 @@ exports.updateOne = Model =>
     if (!doc) {
       return next(new AppError('No document found with that ID', 404));
     }
-  
+
     if (req.body.nombre && Model.modelName == "Chaza") {
       doc.slug = slugify(String(req.body.nombre), { lower: true });
     }
@@ -41,7 +41,7 @@ exports.updateOne = Model =>
     });
   });
 
-exports.createOne = (Model, search=false) =>
+exports.createOne = (Model, search = false) =>
   catchAsync(async (req, res, next) => {
     if (req.file && Model.modelName == "Publication") req.body.imagen = req.file.filename;
     const doc = await Model.create(req.body);
@@ -61,6 +61,25 @@ exports.getOne = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
     console.log(req.params.id)
     let query = Model.findById(req.params.id);
+    if (popOptions) query = query.populate(popOptions);
+    const doc = await query;
+
+    if (!doc) {
+      return next(new AppError('No document found with that ID', 404));
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        data: doc
+      }
+    });
+  });
+
+exports.getOnes = (Model, popOptions) =>
+  catchAsync(async (req, res, next) => {
+    console.log(req.params.id)
+    let query = Model.find({ publication: req.params.id });
     if (popOptions) query = query.populate(popOptions);
     const doc = await query;
 
