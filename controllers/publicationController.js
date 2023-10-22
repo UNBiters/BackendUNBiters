@@ -43,7 +43,7 @@ exports.setUser = (req, res, next) => {
   next();
 };
 
-exports.getAllPublications = factory.getAll(Publication);
+exports.getAllPublications = factory.getAll(Publication, { path: 'reviews' });
 exports.getPublication = factory.getOne(Publication, { path: 'reviews' });
 exports.createPublication = factory.createOne(Publication);
 exports.updatePublication = factory.updateOne(Publication);

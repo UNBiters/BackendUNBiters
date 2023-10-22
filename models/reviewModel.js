@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const Publication = require('./publicationModel');
 
 const reviewSchema = new mongoose.Schema(
   {

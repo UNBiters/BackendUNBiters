@@ -3,11 +3,15 @@ const publicationController = require('./../controllers/publicationController');
 const authController = require('./../controllers/authController');
 const reviewRouter = require('./../routes/reviewRoutes');
 const likeRouter = require('./../routes/likeRoutes');
+const searchController = require('../controllers/searchController');
 
 const router = express.Router();
 
 router.use('/:publicationId/reviews', reviewRouter);
 router.use('/:publicationId/likes', likeRouter);
+
+// Busquedas filtradas:
+router.route('/searchChaza').post(searchController.searchPublication);
 
 // router.use(authController.protect);
 

@@ -44,10 +44,10 @@ exports.updateOne = Model =>
 exports.createOne = (Model, search=false) =>
   catchAsync(async (req, res, next) => {
     if (req.file && Model.modelName == "Publication") req.body.imagen = req.file.filename;
-    console.log(req.body)
     const doc = await Model.create(req.body);
 
-    if (search) searchController.uploadChaza([doc])
+    if (search && Model.modelName == "Chaza") searchController.uploadChaza([doc])
+    if (search && Model.modelName == "Publication") searchController.uploadPublication([doc])
 
     res.status(201).json({
       status: 'success',
@@ -76,7 +76,7 @@ exports.getOne = (Model, popOptions) =>
     });
   });
 
-exports.getAll = Model =>
+exports.getAll = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
     let filter = {};
     const features = new APIFeatures(Model.find(filter), req.query)
@@ -85,6 +85,7 @@ exports.getAll = Model =>
       .limitFields()
       .paginate();
     // const doc = await features.query.explain();
+    if (popOptions) features.query.populate(popOptions);
     const doc = await features.query;
 
     // SEND RESPONSE
