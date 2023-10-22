@@ -24,15 +24,15 @@ const upload = multer({
 exports.uploadChazaImages = upload.fields([
   {name: 'logo', maxCount: 1},
   {name: 'fotos', maxCount: 3},
-  {name: 'banner', maxCount: 1}
+  {name: 'banner', maxCount: 1},
 ]);
 
 // upload.single('image') req.file
 // upload.array('images') req.files
 
 exports.resizeChazaImages = catchAsync(async (req, res, next) => {
-  // console.log(req.files);
-  if (!req.files.fotos || !req.files.banner || !req.files.logo) {
+  console.log(req.files);
+  if (!req.files.fotos && !req.files.banner && !req.files.logo && !req.files.imagenes) {
     return next()
   }
   // Puede que un usuario tenga varias chazas.
@@ -42,35 +42,51 @@ exports.resizeChazaImages = catchAsync(async (req, res, next) => {
     return next(new AppError('No se encontro una chaza asociada a este usuario', 404));
   }
 
-  // 1) Logos:
+  // Logos:
+  if (req.files.logo) {
+    req.body.logo = `chaza-${myChaza.id}-${Date.now()}-logo.jpeg` 
 
-  req.body.logo = `chaza-${myChaza.id}-${Date.now()}-logo.jpeg` 
-
-  await sharp(req.files.logo[0].buffer)
-      .resize(2000, 1333)
-      .toFormat('jpeg')
-      .jpeg({ quality: 90 })
-      .toFile(`public/img/chazas/${req.body.logo}`);
-
+    await sharp(req.files.logo[0].buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/chazas/${req.body.logo}`);
+  }
+  
   // Fotos:
-  req.body.fotos = []
-  await Promise.all(req.files.fotos.map(async (file, i) => {
-    const filename = `chaza-${myChaza.id}-${Date.now()}-${i + 1}.jpeg`;
+  if (req.files.fotos) {
+    // console.log("ENTROOOOOOOOOOOOOOo")
+    req.body.fotos = []
+    await Promise.all(req.files.fotos.map(async (file, i) => {
+      const filename = `chaza-${myChaza.id}-${Date.now()}-${i + 1}.jpeg`;
 
-    await sharp(file.buffer)
-      .resize(2000, 1333)
-      .toFormat('jpeg')
-      .jpeg({ quality: 90 })
-      .toFile(`public/img/chazas/${filename}`);
+      await sharp(file.buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/chazas/${filename}`);
 
-    req.body.fotos.push(filename)
-  }));
+      req.body.fotos.push(filename)
+    }));
+  }
+  
+  // Banner: 
+  if (req.files.banner) {
+    req.body.banner = `chaza-${myChaza.id}-${Date.now()}-banner.jpeg` 
 
-
+    await sharp(req.files.banner[0].buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/chazas/${req.body.banner}`);
+    }
   next()
 });
 
+
 exports.updateMyChaza = catchAsync(async (req, res, next) => {
+  console.log(req.body)
+  // El siguiente código reemplaza las imagenes que se encuentren en los campos de imagenes y borra todas las anteriores que se tenian.
   const updatedChaza = await Chaza.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true});
 
   if (!updatedChaza) {

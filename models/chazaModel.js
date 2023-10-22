@@ -70,7 +70,7 @@ const chazaSchema = new mongoose.Schema({
             type: String,
             maxlength: [180, "Describe tu producto en menos de 180 caracteres"]
         },
-        fotos: [String] 
+        imagenes: [String] 
     }],
     horarioAtencion: {
         type: [String],

@@ -36,6 +36,45 @@ reviewSchema.pre(/^find/, function(next) {
   next();
 });
 
+reviewSchema.statics.calcReviews = async function(publicationId) {
+  
+  const stats = await this.aggregate([
+    {
+      $match: { publication: publicationId}
+    },
+    {
+      $group: {
+        _id: '$publication',
+        numReviews: { $sum: 1 },
+      }
+    }
+  ]);
+  if (stats.length > 0) {
+    await Publication.findByIdAndUpdate(publicationId, {
+      numComentarios: stats[0].numReviews
+    });
+  } else {
+    await Publication.findByIdAndUpdate(publicationId, {
+      numComentarios: 0
+    });
+  }
+};
+
+reviewSchema.post('save', function() {
+  // this points to current review
+  this.constructor.calcReviews(this.publication);
+});
+
+// likeSchema.pre(/^findOneAnd/, async function(next) {
+//   this.r = await this.findOne();
+//   console.log(this.r);
+//   next();
+// });
+
+reviewSchema.post(/^findOneAnd/, async function(doc) {
+  // await this.findOne(); does NOT work here, query has already executed
+  await doc.constructor.calcReviews(doc.publication);
+});
 
 
 const Review = mongoose.model('Review', reviewSchema);

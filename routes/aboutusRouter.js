@@ -5,9 +5,14 @@ const authController = require('./../controllers/authController');
 
 const router = express.Router();
 
+router.use(authController.protect)
+router.use(authController.restrictTo('admin'))
 router.route('/')
     .get(aboutUsController.getAllUs)
-    .post(aboutUsController.createUs);
+    .post(
+        aboutUsController.uploadAboutusImage,
+        aboutUsController.resizeAboutusImage,
+        aboutUsController.createUs);
 
 router.route('/:id')
     .get(aboutUsController.getOneOfUs)

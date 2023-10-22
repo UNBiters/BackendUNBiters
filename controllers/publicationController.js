@@ -50,8 +50,7 @@ exports.updatePublication = factory.updateOne(Publication);
 exports.deletePublication = factory.deleteOne(Publication);
 
 exports.updateMyPublication = catchAsync(async (req, res, next) => {
-    console.log(req.body)
-    console.log(req.file)
+
     const filteredBody = {
         user: req.user.id,
         texto: req.body.texto,

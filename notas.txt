@@ -1,2 +1,9 @@
 En el try catch el argumento del catch es err asi que => err.resonse.data
-Ver foto de perfil del about us
+Ver foto de perfil del about us (Implementada pero no para el update)
+Borrar likes y raiting cuando se eliminan docs. (Creo que ya esta implementado)
+Probar seguidores y lo mismo se eliminan cuando se eliminan docs. (Ya esta implementado)
+Probar endpoint de chazas cuando publican otros usuarios.
+Implementar correos para los seguidores.
+Implementar las fotos de los productos de las chazas. 
+Implementar el calculo de numComentarios en las publicaciones.
+Implementar el cambio de fotos por indice sin que se reemplaze todo para los campos de fotos e imagenes en los productos de chazas.
