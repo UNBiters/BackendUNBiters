@@ -16,40 +16,44 @@ router.route('/searchChaza').post(searchController.searchPublication);
 // router.use(authController.protect);
 
 router
-.route('/')
+    .route('/')
     .get(publicationController.getAllPublications)
     .post(
         authController.protect,
         publicationController.uploadPublicationImage,
-        publicationController.resizePublicationImage, 
+        publicationController.resizePublicationImage,
         publicationController.setUser,
         publicationController.createPublication)
 
 
 router
-.route('/updateMyPublication/:id')
+    .route('/updateMyPublication/:id')
     .patch(
-    authController.protect, 
-    publicationController.uploadPublicationImage,
-    publicationController.resizePublicationImage,
-    publicationController.updateMyPublication);
+        authController.protect,
+        publicationController.uploadPublicationImage,
+        publicationController.resizePublicationImage,
+        publicationController.updateMyPublication);
 
 router
-.route('/deleteMyPublication/:id')
-    .delete(authController.protect,  
-      publicationController.deleteMyPublication);
+    .route('/deleteMyPublication/:id')
+    .delete(authController.protect,
+        publicationController.deleteMyPublication);
 
 router.use(authController.protect);
-router.use(authController.restrictTo('admin'));
+//router.use(authController.restrictTo('admin'));
 
 router
-.route('/:id')
+    .route('/:id')
     .get(publicationController.getPublication)
     .patch(
         publicationController.uploadPublicationImage,
         publicationController.resizePublicationImage,
         publicationController.updatePublication)
     .delete(publicationController.deletePublication);
+
+router
+    .route('/me/:id')
+    .get(publicationController.getMePublications)
 
 
 module.exports = router;
