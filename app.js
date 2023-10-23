@@ -17,7 +17,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
 const chazaRouter = require('./routes/chazaRoutes');
 const likeRouter = require('./routes/likeRoutes');
-const subscribtionRouter = require('./routes/subscriptionRoutes');
+const subscriptionRouter = require('./routes/subscriptionRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const publicationRouter = require('./routes/publicationRoutes');
 const aboutusRouter = require('./routes/aboutusRouter');
@@ -91,7 +91,7 @@ app.use((req, res, next) => {
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/chazas', chazaRouter);
 app.use('/api/v1/likes', likeRouter);
-app.use('/api/v1/subscribtions', subscribtionRouter);
+app.use('/api/v1/payment', subscriptionRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/publications', publicationRouter);
 app.use('/api/v1/aboutus', aboutusRouter);

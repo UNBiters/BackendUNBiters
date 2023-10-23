@@ -96,8 +96,10 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
-  await User.findByIdAndUpdate(req.user.id, { active: false });
-
+  const user = await User.findByIdAndUpdate(req.user.id, { active: false });
+  if (!user) {
+    return next(new AppError('No se encontro ningun usuario para borrar.', 404));
+  }
   res.status(204).json({
     status: 'success',
     data: null
