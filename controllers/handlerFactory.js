@@ -76,10 +76,10 @@ exports.getOne = (Model, popOptions) =>
     });
   });
 
-exports.getOnes = (Model, popOptions) =>
+exports.getOnes = (Model, field, popOptions) =>
   catchAsync(async (req, res, next) => {
     console.log(req.params.id)
-    let query = Model.find({ publication: req.params.id });
+    let query = Model.find({ [field]: req.params.id });
     if (popOptions) query = query.populate(popOptions);
     const doc = await query;
 

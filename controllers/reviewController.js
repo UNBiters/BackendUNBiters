@@ -11,7 +11,7 @@ exports.setPublicationUserIds = (req, res, next) => {
 
 exports.getAllReviews = factory.getAll(Review);
 exports.getReview = factory.getOne(Review);
-exports.getReviews = factory.getOnes(Review);
+exports.getReviews = factory.getOnes(Review, "publication");
 exports.createReview = factory.createOne(Review);
 exports.updateReview = factory.updateOne(Review);
 exports.deleteReview = factory.deleteOne(Review);
