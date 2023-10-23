@@ -1,31 +1,25 @@
-// review / rating / createdAt / ref to tour / ref to user
 const mongoose = require('mongoose');
-const Chaza = require('./chazaModel');
+const Publication = require('./publicationModel');
 
 const reviewSchema = new mongoose.Schema(
   {
     review: {
       type: String,
-      required: [true, 'Review can not be empty!']
-    },
-    rating: {
-      type: Number,
-      min: 1,
-      max: 5
+      required: [true, 'Por favor escribe un comentario antes de publicarlo']
     },
     createdAt: {
       type: Date,
       default: Date.now
     },
-    chaza: {
+    publication: {
       type: mongoose.Schema.ObjectId,
-      ref: 'Chaza',
-      required: [true, 'La review debe estar asociada a una chaza']
+      ref: 'Publication',
+      required: [true, 'El comentario debe estar asociado a una publicación']
     },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
-      required: [true, 'La review debe pertencer a un usuario']
+      required: [true, 'El comentario debe estar asociado a un usuario']
     }
   },
   {
@@ -33,8 +27,6 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true }
   }
 );
-
-reviewSchema.index({ chaza: 1, user: 1 });
 
 reviewSchema.pre(/^find/, function(next) {
   this.populate({
@@ -44,49 +36,45 @@ reviewSchema.pre(/^find/, function(next) {
   next();
 });
 
-reviewSchema.statics.calcAverageRatings = async function(chazaId) {
-  console.log("hola desde review")
+reviewSchema.statics.calcReviews = async function(publicationId) {
+  
   const stats = await this.aggregate([
     {
-      $match: { chaza: chazaId }
+      $match: { publication: publicationId}
     },
     {
       $group: {
-        _id: '$chaza',
-        nRating: { $sum: 1 },
-        avgRating: { $avg: '$rating' }
+        _id: '$publication',
+        numReviews: { $sum: 1 },
       }
     }
   ]);
-
   if (stats.length > 0) {
-    await Chaza.findByIdAndUpdate(chazaId, {
-      ratingsQuantity: stats[0].nRating,
-      ratingsAverage: stats[0].avgRating
+    await Publication.findByIdAndUpdate(publicationId, {
+      numComentarios: stats[0].numReviews
     });
   } else {
-    await Chaza.findByIdAndUpdate(tourId, {
-      ratingsQuantity: 0,
-      ratingsAverage: 4.5
+    await Publication.findByIdAndUpdate(publicationId, {
+      numComentarios: 0
     });
   }
 };
 
 reviewSchema.post('save', function() {
   // this points to current review
-  this.constructor.calcAverageRatings(this.chaza);
+  this.constructor.calcReviews(this.publication);
 });
 
-reviewSchema.pre(/^findOneAnd/, async function(next) {
-  this.r = await this.findOne();
-  next();
-});
+// likeSchema.pre(/^findOneAnd/, async function(next) {
+//   this.r = await this.findOne();
+//   console.log(this.r);
+//   next();
+// });
 
-reviewSchema.post(/^findOneAnd/, async function() {
+reviewSchema.post(/^findOneAnd/, async function(doc) {
   // await this.findOne(); does NOT work here, query has already executed
-  await this.r.constructor.calcAverageRatings(this.r.chaza);
+  await doc.constructor.calcReviews(doc.publication);
 });
-
 
 
 const Review = mongoose.model('Review', reviewSchema);

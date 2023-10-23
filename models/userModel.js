@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
         select: false
+    },
+    nivelSuscripcion: {
+      type: Number,
+      default: 0
     }
 }, {timestamps: true});
 
@@ -66,7 +70,6 @@ userSchema.pre('save', async function(next) {
 
 userSchema.pre('save', function(next) {
   if (!this.isModified('contraseña') || this.isNew) return next();
-
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });

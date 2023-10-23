@@ -1,7 +1,5 @@
 const algoliasearch = require('algoliasearch');
-const Chaza = require('../models/chazaModel');
 const catchAsync = require('./../utils/catchAsync');
-// const server = require('../server');
 
 // Connect and authenticate with your Algolia app
 const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_API_KEY);
@@ -13,12 +11,26 @@ exports.uploadChaza = async (chaza) => {
     await index.saveObjects(chaza, {autoGenerateObjectIDIfNotExist: true});
 };
 
+exports.uploadPublication = async (publication) => {
+    await index.saveObjects(publication, {autoGenerateObjectIDIfNotExist: true});
+};
+
 exports.searchChaza = catchAsync(async (req, res, next) => {
     const chaza = await index.search(req.body.filter);
     res.status(200).json({
         status: 'success',
         data: {
             data: chaza
+        }
+    });
+});
+
+exports.searchPublication = catchAsync(async (req, res, next) => {
+    const publication = await index.search(req.body.filter);
+    res.status(200).json({
+        status: 'success',
+        data: {
+            data: publication
         }
     });
 });

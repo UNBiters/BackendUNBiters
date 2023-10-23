@@ -17,8 +17,10 @@ const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
 const chazaRouter = require('./routes/chazaRoutes');
 const likeRouter = require('./routes/likeRoutes');
-const subscribtionRouter = require('./routes/subscriptionRoutes');
+const subscriptionRouter = require('./routes/subscriptionRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const publicationRouter = require('./routes/publicationRoutes');
+const aboutusRouter = require('./routes/aboutusRouter');
 // const viewRouter = require('./routes/viewRoutes');
 
 
@@ -41,7 +43,7 @@ app.options('*', cors());
 // Set security HTTP headers
 app.use(helmet());
 
-if (process.env.NODE_ENV = 'development') {
+if (process.env.NODE_ENV == 'development') {
   app.use(morgan('dev'));
 }
 
@@ -49,11 +51,12 @@ if (process.env.NODE_ENV = 'development') {
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: 'Superaste el máximo de request desde esta IP, vuelve a intentar en una hora!'
+  message: 'Superaste el máximo número de request desde esta IP, vuelve a intentar en una hora!'
 });
-app.use('/api', limiter);
+//app.use('/api', limiter);
 
-app.use(express.json({ limit: '10kb' }));
+// app.use(express.json({ limit: '10kb' }));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
@@ -64,18 +67,14 @@ app.use(mongoSanitize());
 app.use(xss());
 
 // Prevent parameter pollution
-// app.use(
-//   hpp({
-//     whitelist: [
-//       'duration',
-//       'ratingsQuantity',
-//       'ratingsAverage',
-//       'maxGroupSize',
-//       'difficulty',
-//       'price'
-//     ]
-//   })
-// );
+app.use(
+  hpp({
+    whitelist: [
+      'ratingsQuantity',
+      'ratingsAverage',
+    ]
+  })
+);
 
 app.use(compression());
 
@@ -92,13 +91,16 @@ app.use((req, res, next) => {
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/chazas', chazaRouter);
 app.use('/api/v1/likes', likeRouter);
-app.use('/api/v1/subscribtions', subscribtionRouter);
+app.use('/api/v1/payment', subscriptionRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/publications', publicationRouter);
+app.use('/api/v1/aboutus', aboutusRouter);
 
 
 app.all('*', (req, res, next) => {
   next(new AppError(`No se pudo encontrar ${req.originalUrl} en este servidor!`, 404));
 });
+
 
 app.use(globalErrorHandler);
 
