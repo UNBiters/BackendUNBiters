@@ -39,13 +39,12 @@ router
     .delete(authController.protect,
         publicationController.deleteMyPublication);
 
-router.use(authController.protect);
 //router.use(authController.restrictTo('admin'));
 
 router
     .route('/:id')
     .get(publicationController.getPublication)
-    .patch(
+    .patch(authController.protect,
         publicationController.uploadPublicationImage,
         publicationController.resizePublicationImage,
         publicationController.updatePublication)
@@ -53,7 +52,7 @@ router
 
 router
     .route('/me/:id')
-    .get(publicationController.getMePublications)
+    .get(authController.protect, publicationController.getMePublications)
 
 
 module.exports = router;
