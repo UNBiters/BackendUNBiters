@@ -35,7 +35,7 @@ const chazaSchema = new mongoose.Schema({
     },
     descripcion: {    
         type: String,
-        maxlength: [2, "Por favor danos una descripción con máximo 200 caracteres"]
+        maxlength: [200, "Por favor danos una descripción de máximo 200 caracteres"]
     },
     ubicacion: {
         type: String,

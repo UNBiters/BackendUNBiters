@@ -7,6 +7,7 @@ const router = express.Router({ mergeParams: true });
 // Los usuarios deben estar logeados.
 router.use(authController.protect);
 
+router.get('/myLikeInPublication', likeController.getMyPublicationLike);
 router
   .route('/')
   .get(likeController.getAllLikes)

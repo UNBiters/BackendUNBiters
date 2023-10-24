@@ -47,7 +47,10 @@ exports.createOne = (Model, search = false) =>
     const doc = await Model.create(req.body);
 
     if (search && Model.modelName == "Chaza") searchController.uploadChaza([doc])
-    if (search && Model.modelName == "Publication") searchController.uploadPublication([doc])
+    if (search && Model.modelName == "Publication"){
+      searchController.uploadPublication([doc])
+      console.log("ENTROOOO")
+    } 
 
     res.status(201).json({
       status: 'success',
@@ -78,13 +81,12 @@ exports.getOne = (Model, popOptions) =>
 
 exports.getOnes = (Model, field, popOptions) =>
   catchAsync(async (req, res, next) => {
-    console.log(req.params.id)
     let query = Model.find({ [field]: req.params.id });
     if (popOptions) query = query.populate(popOptions);
     const doc = await query;
 
     if (!doc) {
-      return next(new AppError('No document found with that ID', 404));
+      return next(new AppError('Ningun documento se encontro con ese Id', 404));
     }
 
     res.status(200).json({

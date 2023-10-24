@@ -1,6 +1,6 @@
 const Review = require('./../models/reviewModel');
 const factory = require('./handlerFactory');
-// const catchAsync = require('./../utils/catchAsync');
+const catchAsync = require('./../utils/catchAsync');
 
 exports.setPublicationUserIds = (req, res, next) => {
   // Allow nested routes
@@ -15,3 +15,4 @@ exports.getReviews = factory.getOnes(Review, "publication");
 exports.createReview = factory.createOne(Review);
 exports.updateReview = factory.updateOne(Review);
 exports.deleteReview = factory.deleteOne(Review);
+

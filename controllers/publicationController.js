@@ -46,7 +46,7 @@ exports.setUser = (req, res, next) => {
 exports.getAllPublications = factory.getAll(Publication, { path: 'reviews' });
 exports.getPublication = factory.getOne(Publication, { path: 'reviews' });
 exports.getMePublications = factory.getOnes(Publication, "chaza", { path: 'reviews' });
-exports.createPublication = factory.createOne(Publication);
+exports.createPublication = factory.createOne(Publication, true);
 exports.updatePublication = factory.updateOne(Publication);
 exports.deletePublication = factory.deleteOne(Publication);
 
@@ -84,4 +84,15 @@ exports.deleteMyPublication = catchAsync(async (req, res, next) => {
     status: 'success',
     data: null
   });
-})
+});
+
+exports.getMyPublications = catchAsync(async (req, res, next) => {
+  const publications = await Publication.find({user: req.user.id}).populate({path: 'reviews'});
+  res.status(200).json({
+    status: 'success',
+    data: {
+      publications
+    }
+  });
+});
+

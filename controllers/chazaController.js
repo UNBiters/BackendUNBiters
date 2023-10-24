@@ -131,6 +131,7 @@ exports.setUserChaza = (req, res, next) => {
 // Debe haber ingresado al perfil de la chaza y alli se encontra el boton de follow
 exports.followChaza = catchAsync(async (req, res, next) => {
   const chaza = await Chaza.findOne({ _id: req.params.id });
+  
   let followChaza;
   if (chaza.seguidores.includes(req.user.id)) {
       // Si el usuario ya es seguidor, lo eliminamos y reducimos numSeguidores en 1

@@ -11,7 +11,10 @@ router.use('/:publicationId/reviews', reviewRouter);
 router.use('/:publicationId/likes', likeRouter);
 
 // Busquedas filtradas:
-router.route('/searchChaza').post(searchController.searchPublication);
+router.route('/searchPublication').post(searchController.searchPublication);
+
+// Ver mis publicaciones:
+router.get('/myPublications', authController.protect, publicationController.getMyPublications);
 
 // router.use(authController.protect);
 
