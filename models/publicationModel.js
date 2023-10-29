@@ -18,7 +18,10 @@ const publicationSchema = new mongoose.Schema(
         type: String,
         required: [true, 'La publicación debe tener un texto']
     },
-    imagen: {
+    imagenUrl: {
+        type: String,
+    },
+    imagenId: {
         type: String,
     },
     likes: {

@@ -5,8 +5,15 @@ const sharp = require('sharp');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 
+const path = require('path');
 const multerStorage = multer.memoryStorage();
 
+const storage = multer.diskStorage({
+  destination: path.join(__dirname, "../public/img/publications"),
+  filename: function (req, file, cb) {
+    cb(null, `publication-${req.user.id}-${Date.now()}.jpeg`);
+  },
+});
 const multerFilter = (req, file, cb) => {
   console.log(file)
   if (file.mimetype.startsWith('image')) {
@@ -17,21 +24,22 @@ const multerFilter = (req, file, cb) => {
 };
 
 exports.resizePublicationImage = catchAsync(async (req, res, next) => {
-  if (!req.file) return next();
+  /*if (!req.file) return next();
 
   req.file.filename = `publication-${req.user.id}-${Date.now()}.jpeg`;
+  req.file.path = path.join(__dirname, 'public/img/publications/' + req.file.filename);
 
   await sharp(req.file.buffer)
     .resize(700, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
     .toFile(`public/img/publications/${req.file.filename}`);
-
+*/
   next();
 });
 
 const upload = multer({
-  storage: multerStorage,
+  storage: storage,
   fileFilter: multerFilter
 });
 
@@ -87,7 +95,7 @@ exports.deleteMyPublication = catchAsync(async (req, res, next) => {
 });
 
 exports.getMyPublications = catchAsync(async (req, res, next) => {
-  const publications = await Publication.find({user: req.user.id}).populate({path: 'reviews'});
+  const publications = await Publication.find({ user: req.user.id }).populate({ path: 'reviews' });
   res.status(200).json({
     status: 'success',
     data: {

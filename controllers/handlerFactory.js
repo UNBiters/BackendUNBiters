@@ -3,6 +3,14 @@ const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/apiFeatures');
 const searchController = require('./searchController');
 const slugify = require('slugify');
+const cloudinary = require('cloudinary')
+const fs = require('fs-extra')
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 exports.deleteOne = Model =>
   catchAsync(async (req, res, next) => {
@@ -43,14 +51,21 @@ exports.updateOne = Model =>
 
 exports.createOne = (Model, search = false) =>
   catchAsync(async (req, res, next) => {
-    if (req.file && Model.modelName == "Publication") req.body.imagen = req.file.filename;
+    //console.log(req.file)
+    
+    if (req.file && Model.modelName == "Publication") {
+        const result = await cloudinary.v2.uploader.upload(req.file.path)
+        //console.log(result)
+        req.body.imagenUrl = result.secure_url;
+        req.body.imagenId = result.public_id;
+        await fs.unlink(req.file.path)
+    }
     const doc = await Model.create(req.body);
 
     if (search && Model.modelName == "Chaza") searchController.uploadChaza([doc])
-    if (search && Model.modelName == "Publication"){
+    if (search && Model.modelName == "Publication") {
       searchController.uploadPublication([doc])
-      console.log("ENTROOOO")
-    } 
+    }
 
     res.status(201).json({
       status: 'success',
