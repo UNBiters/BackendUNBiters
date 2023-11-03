@@ -49,14 +49,14 @@ const chazaSchema = new mongoose.Schema({
     slogan: {
         type: String
     },
-    nequi: {
+    /*nequi: {
         type: Boolean,
         required: [true, "Dinos si nequi es uno de tus métodos de pago"]
     },
     daviplata: {
         type: Boolean,
         required: [true, "Dinos si daviplata es uno de tus métodos de pago"]
-    },
+    },¨*/
     productos: [{
         nombre: {
             type: String,
@@ -109,8 +109,15 @@ const chazaSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    mediosPagos: [String],
     etiquetas: [String],
     redesSociales: [String],
+    imagenUrl: {
+        type: String,
+    },
+    imagenId: {
+        type: String,
+    },
     paginaWeb: String
 },
 {
