@@ -15,6 +15,9 @@ router
   );
 
 router
+  .get('/myReviews', reviewController.getMyReviews)
+
+router
   .route('/:id')
   .get(reviewController.getReviews)
   .patch(

@@ -52,13 +52,13 @@ exports.updateOne = Model =>
 exports.createOne = (Model, search = false) =>
   catchAsync(async (req, res, next) => {
     //console.log(req.file)
-    
+
     if (req.file && Model.modelName == "Publication") {
-        const result = await cloudinary.v2.uploader.upload(req.file.path)
-        //console.log(result)
-        req.body.imagenUrl = result.secure_url;
-        req.body.imagenId = result.public_id;
-        await fs.unlink(req.file.path)
+      const result = await cloudinary.v2.uploader.upload(req.file.path)
+      //console.log(result)
+      req.body.imagenUrl = result.secure_url;
+      req.body.imagenId = result.public_id;
+      await fs.unlink(req.file.path)
     }
     const doc = await Model.create(req.body);
 
