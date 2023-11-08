@@ -42,6 +42,10 @@ const publicationSchema = new mongoose.Schema(
         ref: 'Chaza',
         // required: [true, 'La review debe estar asociada a una chaza']
     },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
     nombreChaza: {
         type: String,
         trim: true

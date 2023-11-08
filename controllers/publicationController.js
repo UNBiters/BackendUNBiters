@@ -64,11 +64,19 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
     user: req.user.id,
     texto: req.body.texto,
     nombreChaza: req.body.nombreChaza,
-    rating: req.body.rating
+    rating: req.body.rating,
+    chaza: req.body.chaza,
+    tags: req.body.tags
   }
 
-  if (req.file) filteredBody.imagen = req.file.filename;
-
+  //if (req.file) filteredBody.imagen = req.file.filename;
+  if (req.file && Model.modelName == "Publication") {
+    const result = await cloudinary.v2.uploader.upload(req.file.path)
+    //console.log(result)
+    req.body.imagenUrl = result.secure_url;
+    req.body.imagenId = result.public_id;
+    await fs.unlink(req.file.path)
+  }
   const updatedPublication = await Publication.findByIdAndUpdate(req.params.id, filteredBody, {
     new: true,
     runValidators: true
