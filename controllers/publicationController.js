@@ -9,7 +9,7 @@ const path = require('path');
 const multerStorage = multer.memoryStorage();
 
 const storage = multer.diskStorage({
-  destination: path.join(__dirname, "../temp"),
+  destination: path.join(__dirname, "../tmp"),
   filename: function (req, file, cb) {
     cb(null, `publication-${req.user.id}-${Date.now()}.jpeg`);
   },
