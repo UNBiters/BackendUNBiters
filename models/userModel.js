@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         validate: [validator.isEmail, 'Por favor dinos tu correo valido']
     },
+    sexo: {
+      type: String,
+      enum: ["M", "F", "Otro"]
+    },
     foto: {
         type: String,
         default: 'default.jpg'
@@ -49,6 +53,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
         select: false
+    },
+    cliente: {
+      type: Boolean,
+      default: false
     },
     nivelSuscripcion: {
       type: Number,
