@@ -118,7 +118,9 @@ const chazaSchema = new mongoose.Schema({
     imagenId: {
         type: String,
     },
-    paginaWeb: String
+    paginaWeb: String,
+    facebook: String,
+    instagram: String
 },
 {
     toJSON: { virtuals: true },

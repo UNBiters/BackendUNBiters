@@ -50,7 +50,9 @@ const publicationSchema = new mongoose.Schema(
         type: String,
         trim: true
     },
-    tags: [String]
+    tags: [{
+        type: String
+    }]
   },
   {
     toJSON: { virtuals: true },

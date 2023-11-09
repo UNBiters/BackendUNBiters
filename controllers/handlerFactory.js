@@ -60,6 +60,9 @@ exports.createOne = (Model, search = false) =>
       req.body.imagenId = result.public_id;
       await fs.unlink(req.file.path)
     }
+    if (Model.modelName == "Publication") {
+      req.body.tags = JSON.parse(req.body.tags)
+    }
     const doc = await Model.create(req.body);
 
     if (search && Model.modelName == "Chaza") searchController.uploadChaza([doc])
