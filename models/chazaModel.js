@@ -35,7 +35,7 @@ const chazaSchema = new mongoose.Schema({
     },
     descripcion: {    
         type: String,
-        maxlength: [2, "Por favor danos una descripción con máximo 200 caracteres"]
+        maxlength: [200, "Por favor danos una descripción de máximo 200 caracteres"]
     },
     ubicacion: {
         type: String,
@@ -49,14 +49,14 @@ const chazaSchema = new mongoose.Schema({
     slogan: {
         type: String
     },
-    nequi: {
+    /*nequi: {
         type: Boolean,
         required: [true, "Dinos si nequi es uno de tus métodos de pago"]
     },
     daviplata: {
         type: Boolean,
         required: [true, "Dinos si daviplata es uno de tus métodos de pago"]
-    },
+    },¨*/
     productos: [{
         nombre: {
             type: String,
@@ -109,9 +109,18 @@ const chazaSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    mediosPagos: [String],
     etiquetas: [String],
     redesSociales: [String],
-    paginaWeb: String
+    imagenUrl: {
+        type: String,
+    },
+    imagenId: {
+        type: String,
+    },
+    paginaWeb: String,
+    facebook: String,
+    instagram: String
 },
 {
     toJSON: { virtuals: true },

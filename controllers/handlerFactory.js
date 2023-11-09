@@ -3,6 +3,14 @@ const AppError = require('./../utils/appError');
 const APIFeatures = require('./../utils/apiFeatures');
 const searchController = require('./searchController');
 const slugify = require('slugify');
+const cloudinary = require('cloudinary')
+const fs = require('fs-extra')
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 exports.deleteOne = Model =>
   catchAsync(async (req, res, next) => {
@@ -43,11 +51,24 @@ exports.updateOne = Model =>
 
 exports.createOne = (Model, search = false) =>
   catchAsync(async (req, res, next) => {
-    if (req.file && Model.modelName == "Publication") req.body.imagen = req.file.filename;
+    //console.log(req.file)
+
+    if (req.file && Model.modelName == "Publication") {
+      const result = await cloudinary.v2.uploader.upload(req.file.path)
+      //console.log(result)
+      req.body.imagenUrl = result.secure_url;
+      req.body.imagenId = result.public_id;
+      await fs.unlink(req.file.path)
+    }
+    if (Model.modelName == "Publication") {
+      req.body.tags = JSON.parse(req.body.tags)
+    }
     const doc = await Model.create(req.body);
 
     if (search && Model.modelName == "Chaza") searchController.uploadChaza([doc])
-    if (search && Model.modelName == "Publication") searchController.uploadPublication([doc])
+    if (search && Model.modelName == "Publication") {
+      searchController.uploadPublication([doc])
+    }
 
     res.status(201).json({
       status: 'success',
@@ -78,13 +99,13 @@ exports.getOne = (Model, popOptions) =>
 
 exports.getOnes = (Model, field, popOptions) =>
   catchAsync(async (req, res, next) => {
-    console.log(req.params.id)
+    console.log({ [field]: req.params.id })
     let query = Model.find({ [field]: req.params.id });
     if (popOptions) query = query.populate(popOptions);
     const doc = await query;
 
     if (!doc) {
-      return next(new AppError('No document found with that ID', 404));
+      return next(new AppError('Ningun documento se encontro con ese Id', 404));
     }
 
     res.status(200).json({
@@ -99,6 +120,32 @@ exports.getAll = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
     let filter = {};
     const features = new APIFeatures(Model.find(filter), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    // const doc = await features.query.explain();
+    if (popOptions) features.query.populate(popOptions);
+    const doc = await features.query;
+
+    // SEND RESPONSE
+    res.status(200).json({
+      status: 'success',
+      results: doc.length,
+      data: {
+        data: doc
+      }
+    });
+  });
+
+exports.getAllNames = (Model, popOptions) =>
+  catchAsync(async (req, res, next) => {
+    let filter = {};
+
+    const query = Model.find(filter);
+
+    query.select("nombre");
+    const features = new APIFeatures(query, req.query)
       .filter()
       .sort()
       .limitFields()

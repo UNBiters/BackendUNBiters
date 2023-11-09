@@ -5,8 +5,15 @@ const sharp = require('sharp');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 
+const path = require('path');
 const multerStorage = multer.memoryStorage();
 
+const storage = multer.diskStorage({
+  destination: path.join(__dirname, "../public/img/publications"),
+  filename: function (req, file, cb) {
+    cb(null, `publication-${req.user.id}-${Date.now()}.jpeg`);
+  },
+});
 const multerFilter = (req, file, cb) => {
   console.log(file)
   if (file.mimetype.startsWith('image')) {
@@ -17,21 +24,22 @@ const multerFilter = (req, file, cb) => {
 };
 
 exports.resizePublicationImage = catchAsync(async (req, res, next) => {
-  if (!req.file) return next();
+  /*if (!req.file) return next();
 
   req.file.filename = `publication-${req.user.id}-${Date.now()}.jpeg`;
+  req.file.path = path.join(__dirname, 'public/img/publications/' + req.file.filename);
 
   await sharp(req.file.buffer)
     .resize(700, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
     .toFile(`public/img/publications/${req.file.filename}`);
-
+*/
   next();
 });
 
 const upload = multer({
-  storage: multerStorage,
+  storage: storage,
   fileFilter: multerFilter
 });
 
@@ -46,7 +54,7 @@ exports.setUser = (req, res, next) => {
 exports.getAllPublications = factory.getAll(Publication, { path: 'reviews' });
 exports.getPublication = factory.getOne(Publication, { path: 'reviews' });
 exports.getMePublications = factory.getOnes(Publication, "chaza", { path: 'reviews' });
-exports.createPublication = factory.createOne(Publication);
+exports.createPublication = factory.createOne(Publication, true);
 exports.updatePublication = factory.updateOne(Publication);
 exports.deletePublication = factory.deleteOne(Publication);
 
@@ -56,11 +64,19 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
     user: req.user.id,
     texto: req.body.texto,
     nombreChaza: req.body.nombreChaza,
-    rating: req.body.rating
+    rating: req.body.rating,
+    chaza: req.body.chaza,
+    tags: req.body.tags
   }
 
-  if (req.file) filteredBody.imagen = req.file.filename;
-
+  //if (req.file) filteredBody.imagen = req.file.filename;
+  if (req.file && Model.modelName == "Publication") {
+    const result = await cloudinary.v2.uploader.upload(req.file.path)
+    //console.log(result)
+    req.body.imagenUrl = result.secure_url;
+    req.body.imagenId = result.public_id;
+    await fs.unlink(req.file.path)
+  }
   const updatedPublication = await Publication.findByIdAndUpdate(req.params.id, filteredBody, {
     new: true,
     runValidators: true
@@ -84,4 +100,15 @@ exports.deleteMyPublication = catchAsync(async (req, res, next) => {
     status: 'success',
     data: null
   });
-})
+});
+
+exports.getMyPublications = catchAsync(async (req, res, next) => {
+  const publications = await Publication.find({ user: req.user.id }).populate({ path: 'reviews' });
+  res.status(200).json({
+    status: 'success',
+    data: {
+      publications
+    }
+  });
+});
+

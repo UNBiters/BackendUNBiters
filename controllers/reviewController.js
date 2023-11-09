@@ -1,6 +1,6 @@
 const Review = require('./../models/reviewModel');
 const factory = require('./handlerFactory');
-// const catchAsync = require('./../utils/catchAsync');
+const catchAsync = require('./../utils/catchAsync');
 
 exports.setPublicationUserIds = (req, res, next) => {
   // Allow nested routes
@@ -15,3 +15,17 @@ exports.getReviews = factory.getOnes(Review, "publication");
 exports.createReview = factory.createOne(Review);
 exports.updateReview = factory.updateOne(Review);
 exports.deleteReview = factory.deleteOne(Review);
+
+exports.getMyReviews = catchAsync(async (req, res, next) => {
+  console.log(req.user.id)
+  const reviews = await Review.find({ user: req.user.id }).populate({ path: 'user' });
+  res.status(200).json({
+    status: 'success',
+    data: {
+      reviews
+    }
+  });
+});
+
+
+

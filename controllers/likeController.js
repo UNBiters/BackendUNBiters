@@ -19,7 +19,28 @@ exports.upsertLike = catchAsync(async (req, res, next) => {
             userLike
         }
     });
-})
+});
+
+exports.getMyPublicationLike = catchAsync(async (req, res, netx) => {
+    const like = await Like.findOne({
+        user: req.user.id,
+        publication: req.params.publicationId
+    });
+    let status;
+    if (!like) {
+        status = false;
+    }
+    else {
+        status = like.active;
+    }
+    
+    res.status(200).json({
+        status: 'success',
+        data: {
+            status
+        }
+    });
+});
 
 // exports.upsert = catchAsync(async (req, res, next) => {
 //     const userLike = await Like.findOne({user: req.user.id});

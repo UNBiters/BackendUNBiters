@@ -5,19 +5,28 @@ const factory = require('./handlerFactory');
 const multer = require('multer');
 const sharp = require('sharp');
 const slugify = require('slugify');
+const path = require('path');
 
 const multerStorage = multer.memoryStorage();
 
+const storage = multer.diskStorage({
+  destination: path.join(__dirname, "../public/img/publications"),
+  filename: function (req, file, cb) {
+    cb(null, `publication-${req.user.id}-${Date.now()}.jpeg`);
+  },
+});
 const multerFilter = (req, file, cb) => {
+  console.log(file)
   if (file.mimetype.startsWith('image')) {
     cb(null, true)
   } else {
-    cb(new AppError('No es una imagen! Por favor sube una imagen', 400), false);
+    cb(new AppError('El archivo no es una imagen! Por favor sube una imagen', 400), false);
   }
 };
 
+
 const upload = multer({
-  storage: multerStorage,
+  storage: storage,
   fileFilter: multerFilter
 });
 
@@ -131,6 +140,7 @@ exports.setUserChaza = (req, res, next) => {
 // Debe haber ingresado al perfil de la chaza y alli se encontra el boton de follow
 exports.followChaza = catchAsync(async (req, res, next) => {
   const chaza = await Chaza.findOne({ _id: req.params.id });
+  
   let followChaza;
   if (chaza.seguidores.includes(req.user.id)) {
       // Si el usuario ya es seguidor, lo eliminamos y reducimos numSeguidores en 1
@@ -164,6 +174,7 @@ exports.followChaza = catchAsync(async (req, res, next) => {
 
 exports.getChaza = factory.getOne(Chaza, { path: 'publications' });
 exports.getAllChazas = factory.getAll(Chaza);
+exports.getAllChazasNames = factory.getAllNames(Chaza);
 exports.createChaza = factory.createOne(Chaza, true);
 
 // Do NOT update passwords with this!
