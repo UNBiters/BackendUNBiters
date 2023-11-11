@@ -184,9 +184,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // 3) Send it to user's email
   try {
-    const resetURL = `${req.protocol}://${req.get(
+    const resetURL = `http://localhost:3001/unbiters/help/reset-password/#${resetToken}`;
+    /*const resetURL = `${req.protocol}://${req.get(
       'host'
-    )}/api/v1/users/resetPassword/${resetToken}`;
+    )}/api/v1/users/resetPassword/${resetToken}`;*/
     // await new Email(user, resetURL).sendPasswordReset();
 
     const message = `¿Olvidaste tu contraseña? Actualiza tu contraseña en el siguiente link: ${resetURL}\nSi aun recuerdas tu contraseña, por favor ignora este correo!`;
@@ -223,8 +224,10 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     .createHash('sha256')
     .update(req.params.token)
     .digest('hex');
+    
 
-  const user = await User.findOne({
+    console.log(req.params.token)
+    const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() }
   });
