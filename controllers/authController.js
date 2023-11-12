@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('./../models/userModel');
+const Chaza = require('./../models/chazaModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const Email = require('./../utils/email');
@@ -12,7 +13,7 @@ const signToken = id => {
   });
 };
 
-const createSendToken = (user, statusCode, req, res) => {
+const createSendToken = (user, chaza, statusCode, req, res) => {
   const token = signToken(user._id);
 
   const cookieOptions = {
@@ -32,7 +33,7 @@ const createSendToken = (user, statusCode, req, res) => {
     status: 'success',
     token,
     data: {
-      user
+      user, chaza
     }
   });
 };
@@ -70,9 +71,12 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(contraseña, user.contraseña))) {
     return next(new AppError('Correo o contraseña incorrecta', 401));
   }
-
+  var chaza = null
+  if (user.chaza) {
+    chaza = await Chaza.findOne({ propietarios: user.id });
+  }
   // 3) If everything ok, send token to client
-  createSendToken(user, 200, req, res);
+  createSendToken(user, chaza, 200, req, res);
 });
 
 exports.logout = (req, res) => {
@@ -92,7 +96,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1]
   }
-   else if (req.cookies.jwt) {
+  else if (req.cookies.jwt) {
     token = req.cookies.jwt;
   }
 
@@ -224,10 +228,10 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     .createHash('sha256')
     .update(req.params.token)
     .digest('hex');
-    
 
-    console.log(req.params.token)
-    const user = await User.findOne({
+
+  console.log(req.params.token)
+  const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() }
   });
