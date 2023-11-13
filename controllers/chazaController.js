@@ -6,13 +6,21 @@ const multer = require("multer");
 const sharp = require("sharp");
 const slugify = require("slugify");
 const path = require("path");
+const cloudinary = require("cloudinary");
+const fs = require("fs-extra");
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const multerStorage = multer.memoryStorage();
 
 const storage = multer.diskStorage({
     destination: path.join("/tmp"),
     filename: function (req, file, cb) {
-        cb(null, `publication-${req.user.id}-${Date.now()}.jpeg`);
+        cb(null, `chaza-${req.user.id}-${Date.now()}.jpeg`);
     },
 });
 const multerFilter = (req, file, cb) => {
@@ -32,14 +40,7 @@ const upload = multer({
     fileFilter: multerFilter,
 });
 
-exports.uploadChazaImages = upload.fields([
-    { name: "logo", maxCount: 1 },
-    { name: "fotos", maxCount: 3 },
-    { name: "banner", maxCount: 1 },
-]);
-
-// upload.single('image') req.file
-// upload.array('images') req.files
+exports.uploadChazaImage = upload.single("imagen");
 
 exports.resizeChazaImages = catchAsync(async (req, res, next) => {
     console.log(req.files);
@@ -99,8 +100,16 @@ exports.resizeChazaImages = catchAsync(async (req, res, next) => {
 });
 
 exports.updateMyChaza = catchAsync(async (req, res, next) => {
-    console.log(req.body);
+    console.log("body", req.body);
     // El siguiente código reemplaza las imagenes que se encuentren en los campos de imagenes y borra todas las anteriores que se tenian.
+
+    if (req.file) {
+        const result = await cloudinary.v2.uploader.upload(req.file.path);
+        //console.log(result)
+        req.body.imagenUrl = result.secure_url;
+        req.body.imagenId = result.public_id;
+        await fs.unlink(req.file.path);
+    }
     const updatedChaza = await Chaza.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
@@ -111,7 +120,6 @@ exports.updateMyChaza = catchAsync(async (req, res, next) => {
             new AppError("No se encontro una chaza asociada a este usuario", 404)
         );
     }
-
     if (req.body.nombre) {
         updatedChaza.slug = slugify(req.body.nombre, { lower: true });
     }
