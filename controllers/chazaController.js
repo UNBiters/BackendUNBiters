@@ -94,7 +94,7 @@ exports.resizeChazaImages = catchAsync(async (req, res, next) => {
 
 
 exports.updateMyChaza = catchAsync(async (req, res, next) => {
-  console.log(req.body)
+  // console.log(req.body)
   // El siguiente código reemplaza las imagenes que se encuentren en los campos de imagenes y borra todas las anteriores que se tenian.
   const updatedChaza = await Chaza.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true});
 

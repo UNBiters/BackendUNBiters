@@ -197,12 +197,6 @@ chazaSchema.pre("save", async function(next) {
     next();
 });
 
-chazaSchema.pre(/^findByIdAnd/, function(next) {
-    console.log(this);
-    this.slug = slugify(this.nombre, { lower: true });
-    next();
-})
-
 chazaSchema.post("save", async function(doc, next) {
     const Publication = mongoose.model("Publication");
     await Publication.calcAverageRatings(doc._id);

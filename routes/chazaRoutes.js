@@ -29,8 +29,8 @@ router.route('/updateMyChaza/:id')
   .patch(
     authController.protect,
     authController.restrictTo('chazaUser', 'admin'),
-    chazaController.uploadChazaImages,
-    chazaController.resizeChazaImages,
+    // chazaController.uploadChazaImages,
+    // chazaController.resizeChazaImages,
     chazaController.updateMyChaza);
 
 router
