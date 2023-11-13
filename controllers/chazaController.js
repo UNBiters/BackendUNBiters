@@ -130,7 +130,7 @@ exports.chazasPubli = (req, res, next) => {
     req.query.sort = '-ratingsAverage';
     req.query.fields = 'etiquetas,nombre,slogan,logo,ratingsAverage,banner,comentarios';
     next();
-  };
+};
 
 exports.setUserChaza = (req, res, next) => {
   if (!req.body.propietarios) req.body.propietarios = req.user.id;

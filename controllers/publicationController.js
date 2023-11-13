@@ -4,6 +4,8 @@ const multer = require('multer');
 const sharp = require('sharp');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
+const slugify = require('slugify');
+const Chaza = require('../models/chazaModel');
 
 const path = require('path');
 const multerStorage = multer.memoryStorage();
@@ -77,10 +79,25 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
     req.body.imagenId = result.public_id;
     await fs.unlink(req.file.path)
   }
-  const updatedPublication = await Publication.findByIdAndUpdate(req.params.id, filteredBody, {
+
+  const currentPublication = await Publication.findOne({ _id: req.params.id, user: req.user.id });
+  const updatedPublication = await Publication.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, filteredBody, {
     new: true,
     runValidators: true
   });
+  
+  if (!currentPublication) {
+    return next(new AppError("No se encontro la publicación buscada por este usuario", 404));
+  }
+
+  console.log(updatedPublication);
+  const slug = slugify(currentPublication.nombreChaza, {lower: true});
+  if (slug != updatedPublication.slug) {
+    await Chaza.findOneAndUpdate({ slug }, { $inc: { numPublications: -1 } })
+    await Chaza.findOneAndUpdate({ slug: updatedPublication.slug }, { $inc: { numPublications: 1 } } )
+  }
+
+
 
   res.status(200).json({
     status: 'success',
@@ -91,7 +108,7 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteMyPublication = catchAsync(async (req, res, next) => {
-  const deletedPublication = await Publication.findByIdAndDelete(req.params.id);
+  const deletedPublication = await Publication.findOneAndDelete({ _id:req.params.id, user: req.user.id });
   if (!deletedPublication) {
     return next(new AppError('No se encontro una publicación asociada a este usuario', 404));
   }

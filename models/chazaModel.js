@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const User = require("./userModel");
+const AppError = require('../utils/appError');
 
 const chazaSchema = new mongoose.Schema({
     nombre: {
@@ -120,7 +122,11 @@ const chazaSchema = new mongoose.Schema({
     },
     paginaWeb: String,
     facebook: String,
-    instagram: String
+    instagram: String,
+    numPublications: {
+        type: Number,
+        default: 0
+    }
 },
 {
     toJSON: { virtuals: true },
@@ -135,12 +141,63 @@ chazaSchema.virtual('publications', {
     foreignField: 'chaza',
     localField: '_id'
 });
+
+chazaSchema.statics.numChazasPropietario = async function(propietario) {
+    const stats = await this.aggregate([
+        {
+            $match: { "propietarios": propietario} 
+        },
+        {
+            $unwind: "$propietarios"
+        },
+        {
+            $group: {
+                _id: "$propietarios",
+                count: { $sum: 1 }
+            }
+        }
+    ]);
+    if (stats.length > 0) {
+        return stats[0].count;
+    } else {
+        return 0;
+    }
+}
+
+
+
+chazaSchema.pre("save", async function(next) {
+    const numChazas = await this.constructor.numChazasPropietario(this.propietarios);
+    const propietario = await User.findById(this.propietarios);
+    if (numChazas == 1 && propietario.nivelSuscripcion == 0) {
+        return next(new AppError("Si deseas tener más de una chaza, por favor adquiere el plan especial", 403));
+    } else  {
+        next();
+    }
+});
   
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()
 chazaSchema.pre('save', function(next) {
     this.slug = slugify(this.nombre, { lower: true });
     next();
 });
+
+chazaSchema.pre("save", async function(next) {
+    const Publication = mongoose.model("Publication");
+
+    // Contar publicaciones existentes
+    const numPublications = await Publication.countDocuments({ slug: this.slug });
+
+    // Actualizar el campo 'chaza' en las publicaciones que coincidan
+    if (numPublications) {
+        await Publication.updateMany({ slug: this.slug }, { chaza: this._id });
+        this.numPublications = numPublications;
+    }
+    
+    next();
+});
+
+
 
 
 const Chaza = mongoose.model('Chaza', chazaSchema);

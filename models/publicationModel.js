@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Chaza = require('./chazaModel');
+const slugify = require('slugify');
 
 const publicationSchema = new mongoose.Schema(
   {
@@ -52,7 +53,8 @@ const publicationSchema = new mongoose.Schema(
     },
     tags: [{
         type: String
-    }]
+    }],
+    slug: String
   },
   {
     toJSON: { virtuals: true },
@@ -75,14 +77,37 @@ publicationSchema.virtual('reviews', {
     localField: '_id'
 });
 
+publicationSchema.statics.numPublicationsChaza = async function(nombreChaza) {
+    const numPublications = await mongoose.model('Publication').countDocuments({ slug: nombreChaza });
+    return await Chaza.findOneAndUpdate({ slug: nombreChaza }, { numPublications });  
+};
+
 publicationSchema.pre('save', async function(next) {
+    this.slug = slugify(this.nombreChaza, { lower: true });
     if (!this.nombreChaza) return next();
-    const chazaId = await Chaza.findOne({nombre: this.nombreChaza}, '_id');
+    const chazaId = await Chaza.findOne({ slug: this.slug }, '_id');
     if (chazaId) {
         this.chaza = chazaId.id
     } 
     next();
 });
+
+publicationSchema.pre(/^findOneAnd/, async function(next) {
+    const update = this.getUpdate();
+
+    // Solo aplica si 'nombreChaza' está en la actualización
+    if (!update || !update.nombreChaza) return next();
+    const slug = slugify(update.nombreChaza, { lower: true });
+    this.set({ slug: slug }); 
+
+    if (!update.$set) return next();
+    const chazaId = await Chaza.findOne({ slug: update.$set.slug }, '_id');
+    this.set({ chaza: chazaId });
+    
+
+    next();
+});
+
 
 publicationSchema.statics.calcAverageRatings = async function(chazaId) {
     if (!chazaId) return
@@ -111,9 +136,10 @@ publicationSchema.statics.calcAverageRatings = async function(chazaId) {
     }
 };
 
-publicationSchema.post('save', function() {
+publicationSchema.post('save', async function(doc) {
     // this points to current review
-    this.constructor.calcAverageRatings(this.chaza);
+    doc.constructor.calcAverageRatings(doc.chaza);
+    await doc.constructor.numPublicationsChaza(doc.slug);
 });
 
 // publicationSchema.pre(/^findOneAnd/, async function(next) {
@@ -125,6 +151,7 @@ publicationSchema.post(/^findOneAnd/, async function(doc, next) {
     // await this.findOne(); does NOT work here, query has already executed
     if (!doc) return next()
     await doc.constructor.calcAverageRatings(doc.chaza);
+    await doc.constructor.numPublicationsChaza(doc.slug);
 });
 
 
