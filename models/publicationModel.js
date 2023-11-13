@@ -103,6 +103,8 @@ publicationSchema.pre(/^findOneAnd/, async function(next) {
     if (!update.$set) return next();
     const chazaId = await Chaza.findOne({ slug: update.$set.slug }, '_id');
     this.set({ chaza: chazaId });
+
+    // updateOne
     
     next();
 });

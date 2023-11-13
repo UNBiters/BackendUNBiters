@@ -82,9 +82,10 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
 
   const currentPublication = await Publication.findOne({ _id: req.params.id, user: req.user.id });
   const updatedPublication = await Publication.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, filteredBody, {
-    new: true,
     runValidators: true
   });
+
+  console.log(updatedPublication)
   
   if (!currentPublication) {
     return next(new AppError("No se encontro la publicación buscada por este usuario", 404));
