@@ -207,5 +207,6 @@ chazaSchema.post("save", async function(doc, next) {
     await Publication.calcAverageRatings(doc._id);
 })
 
+
 const Chaza = mongoose.model('Chaza', chazaSchema);
 module.exports = Chaza;
