@@ -136,8 +136,9 @@ publicationSchema.statics.calcAverageRatings = async function(chazaId) {
     }
 };
 
-publicationSchema.post('save', async function(doc) {
+publicationSchema.post('save', async function(doc, next) {
     // this points to current review
+    if (!doc) return next()
     await doc.constructor.numPublicationsChaza(doc.slug);
     await doc.constructor.calcAverageRatings(doc.chaza);
 });
