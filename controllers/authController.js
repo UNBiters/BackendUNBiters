@@ -13,7 +13,7 @@ const signToken = id => {
   });
 };
 
-const createSendToken = (user, chaza, statusCode, req, res) => {
+const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
   const cookieOptions = {
@@ -24,7 +24,7 @@ const createSendToken = (user, chaza, statusCode, req, res) => {
     // secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
   }
   if (process.env.NODE_ENV.trim() == 'production') cookieOptions.secure = true;
-  res.cookie('jwt', token, cookieOptions);
+  // res.cookie('jwt', token, cookieOptions);
 
   // Remove password from output
   user.contraseña = undefined;
@@ -33,7 +33,7 @@ const createSendToken = (user, chaza, statusCode, req, res) => {
     status: 'success',
     token,
     data: {
-      user, chaza
+      user
     }
   });
 };
@@ -71,12 +71,9 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(contraseña, user.contraseña))) {
     return next(new AppError('Correo o contraseña incorrecta', 401));
   }
-  var chaza = null
-  if (user.chaza) {
-    chaza = await Chaza.findOne({ propietarios: user.id });
-  }
+  
   // 3) If everything ok, send token to client
-  createSendToken(user, chaza, 200, req, res);
+  createSendToken(user, 200, req, res);
 });
 
 exports.logout = (req, res) => {
