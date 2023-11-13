@@ -138,8 +138,8 @@ publicationSchema.statics.calcAverageRatings = async function(chazaId) {
 
 publicationSchema.post('save', async function(doc) {
     // this points to current review
-    doc.constructor.calcAverageRatings(doc.chaza);
     await doc.constructor.numPublicationsChaza(doc.slug);
+    await doc.constructor.calcAverageRatings(doc.chaza);
 });
 
 // publicationSchema.pre(/^findOneAnd/, async function(next) {
@@ -150,8 +150,8 @@ publicationSchema.post('save', async function(doc) {
 publicationSchema.post(/^findOneAnd/, async function(doc, next) {
     // await this.findOne(); does NOT work here, query has already executed
     if (!doc) return next()
-    await doc.constructor.calcAverageRatings(doc.chaza);
     await doc.constructor.numPublicationsChaza(doc.slug);
+    await doc.constructor.calcAverageRatings(doc.chaza);
 });
 
 
