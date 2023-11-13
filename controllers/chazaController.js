@@ -110,23 +110,29 @@ exports.updateMyChaza = catchAsync(async (req, res, next) => {
         req.body.imagenId = result.public_id;
         await fs.unlink(req.file.path);
     }
+
+    if (req.body.nombre) {
+        req.body.slug = slugify(req.body.nombre, { lower: true });
+    }
+    if (req.body.tags) {
+        req.body.tags = JSON.parse(req.body.tags);
+    }
+    if (req.body.horarioAtencion) {
+        req.body.horarioAtencion = JSON.parse(req.body.horarioAtencion);
+    }
+    if (req.body.mediosPagos) {
+        req.body.mediosPagos = JSON.parse(req.body.mediosPagos);
+    }
+
     const updatedChaza = await Chaza.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
     });
-
     if (!updatedChaza) {
         return next(
             new AppError("No se encontro una chaza asociada a este usuario", 404)
         );
     }
-    if (req.body.nombre) {
-        updatedChaza.slug = slugify(req.body.nombre, { lower: true });
-    }
-    if (req.body.tags) {
-        updatedChaza.tags = JSON.parse(req.body.tags);
-    }
-
     res.status(200).json({
         status: "success",
         data: {
