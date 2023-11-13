@@ -104,7 +104,6 @@ publicationSchema.pre(/^findOneAnd/, async function(next) {
     const chazaId = await Chaza.findOne({ slug: update.$set.slug }, '_id');
     this.set({ chaza: chazaId });
     
-
     next();
 });
 
@@ -123,6 +122,7 @@ publicationSchema.statics.calcAverageRatings = async function(chazaId) {
             }
         }
     ]);
+
     if (stats.length > 0) {
         await Chaza.findByIdAndUpdate(chazaId, {
         ratingsQuantity: stats[0].nRating,

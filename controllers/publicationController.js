@@ -90,11 +90,11 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
     return next(new AppError("No se encontro la publicación buscada por este usuario", 404));
   }
 
-  console.log(updatedPublication);
+
   const slug = slugify(currentPublication.nombreChaza, {lower: true});
   if (slug != updatedPublication.slug) {
     await Chaza.findOneAndUpdate({ slug }, { $inc: { numPublications: -1 } })
-    await Chaza.findOneAndUpdate({ slug: updatedPublication.slug }, { $inc: { numPublications: 1 } } )
+    // await Chaza.findOneAndUpdate({ slug: updatedPublication.slug }, { $inc: { numPublications: 1 } } )
   }
 
 
