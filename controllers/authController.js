@@ -44,7 +44,9 @@ exports.signup = catchAsync(async (req, res, next) => {
     correo: req.body.correo,
     contraseña: req.body.contraseña,
     confirmarContraseña: req.body.confirmarContraseña,
+    fechaNacimiento: req.body.fechaNacimiento,
     chaza: req.body.chaza,
+    sexo: req.body.sexo,
     rol: req.body.chaza === true ? "chazaUser" : "usuario"
   });
 

@@ -130,3 +130,40 @@ exports.getMyPublications = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.sexPubliStats = catchAsync(async (req, res, next) => {
+  if (req.user.nivelSuscripcion == 0) return next(new AppError("Si deseas ver estadisticas de tus chazas, por favor adquiere el plan especial", 403));
+  const misChazas = await Chaza.find({ propietarios: req.user.id }).populate({ path: 'publications' });
+
+  if (!misChazas.length) {
+      return next(new AppError('No se encontraron chazas para este usuario.', 404));
+  }
+
+  const conteoChazas = [];
+
+  misChazas.forEach(chaza => {
+      const conteoPorSexo = { "M": 0, "F": 0, "Otro": 0 };
+      
+      chaza.publications.forEach(publicacion => {
+          const sexo = publicacion.user.sexo;
+          if (conteoPorSexo.hasOwnProperty(sexo)) {
+              conteoPorSexo[sexo]++;
+          }
+      });
+
+      conteoChazas.push({ 
+          nombreChaza: chaza.nombre,
+          conteoPorSexo 
+      });
+  });
+
+  console.log(conteoChazas);
+
+  res.status(200).json({
+      status: 'success',
+      data: {
+          conteoChazas
+      }
+  });
+});
+
+

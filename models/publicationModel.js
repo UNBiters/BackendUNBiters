@@ -65,7 +65,7 @@ const publicationSchema = new mongoose.Schema(
 publicationSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'user',
-    select: 'nombre foto'
+    select: 'nombre foto sexo correo'
   });
   next();
 });
@@ -138,11 +138,17 @@ publicationSchema.statics.calcAverageRatings = async function(chazaId) {
     }
 };
 
+
 publicationSchema.post('save', async function(doc, next) {
     // this points to current review
     if (!doc) return next()
     await doc.constructor.numPublicationsChaza(doc.slug);
     await doc.constructor.calcAverageRatings(doc.chaza);
+
+    // Si no es nuevo significa que es una actualización.
+    // if (!doc.isNew) {
+    //     await doc.numPublicationsPerSex(doc.user);
+    // }
 });
 
 // publicationSchema.pre(/^findOneAnd/, async function(next) {

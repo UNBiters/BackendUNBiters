@@ -11,10 +11,9 @@ exports.sendEmail = (user, subject, text, url, template) => {
     url,
     subject
   });
-
   const msg = {
       to: user.correo, // Change to your recipient
-      from: 'dpovedat@unal.edu.co', // Change to your verified sender
+      from: process.env.EMAIL_FROM, // Change to your verified sender
       subject,
       text,
       html
