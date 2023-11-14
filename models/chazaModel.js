@@ -74,10 +74,10 @@ const chazaSchema = new mongoose.Schema({
         },
         imagenes: [String] 
     }],
-    horarioAtencion: {
-        type: [String],
-        required: [true, "Por favor dinos tu horario de atención"]
-    },
+    horarioAtencion:  [{
+        type: String
+        
+    }],
     universidad: {
         type: String,
         default: "Universidad Nacional"
@@ -111,7 +111,9 @@ const chazaSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    mediosPagos: [String],
+    mediosPagos:  [{
+        type: String
+    }],
     etiquetas: [String],
     redesSociales: [String],
     imagenUrl: {
@@ -120,6 +122,9 @@ const chazaSchema = new mongoose.Schema({
     imagenId: {
         type: String,
     },
+    tags: [{
+        type: String
+    }],
     paginaWeb: String,
     facebook: String,
     instagram: String,
