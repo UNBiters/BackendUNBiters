@@ -4,6 +4,8 @@ const multer = require('multer');
 const sharp = require('sharp');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
+const slugify = require('slugify');
+const Chaza = require('../models/chazaModel');
 
 const path = require('path');
 const multerStorage = multer.memoryStorage();
@@ -15,7 +17,7 @@ const storage = multer.diskStorage({
   },
 });
 const multerFilter = (req, file, cb) => {
-  console.log(file)
+  // console.log(file)
   if (file.mimetype.startsWith('image')) {
     cb(null, true)
   } else {
@@ -77,10 +79,24 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
     req.body.imagenId = result.public_id;
     await fs.unlink(req.file.path)
   }
-  const updatedPublication = await Publication.findByIdAndUpdate(req.params.id, filteredBody, {
-    new: true,
+
+  const currentPublication = await Publication.findOne({ _id: req.params.id, user: req.user.id });
+  const updatedPublication = await Publication.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, filteredBody, {
     runValidators: true
   });
+  
+  if (!currentPublication) {
+    return next(new AppError("No se encontro la publicación buscada por este usuario", 404));
+  }
+
+
+  const slug = slugify(currentPublication.nombreChaza, {lower: true});
+  if (slug != updatedPublication.slug) {
+    await Chaza.findOneAndUpdate({ slug }, { $inc: { numPublications: -1 } })
+    // await Chaza.findOneAndUpdate({ slug: updatedPublication.slug }, { $inc: { numPublications: 1 } } )
+  }
+
+
 
   res.status(200).json({
     status: 'success',
@@ -91,7 +107,7 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteMyPublication = catchAsync(async (req, res, next) => {
-  const deletedPublication = await Publication.findByIdAndDelete(req.params.id);
+  const deletedPublication = await Publication.findOneAndDelete({ _id:req.params.id, user: req.user.id });
   if (!deletedPublication) {
     return next(new AppError('No se encontro una publicación asociada a este usuario', 404));
   }
@@ -108,6 +124,104 @@ exports.getMyPublications = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       publications
+    }
+  });
+});
+
+exports.sexPubliStats = catchAsync(async (req, res, next) => {
+  if (req.user.nivelSuscripcion == 0) return next(new AppError("Si deseas ver estadisticas de tus chazas, por favor adquiere el plan especial", 403));
+  const misChazas = await Chaza.find({ propietarios: req.user.id }).populate({ path: 'publications' });
+
+  if (!misChazas.length) {
+      return next(new AppError('No se encontraron chazas para este usuario.', 404));
+  }
+
+  const conteoChazas = [];
+
+  misChazas.forEach(chaza => {
+      const conteoPorSexo = { "M": 0, "F": 0, "Otro": 0 };
+      
+      chaza.publications.forEach(publicacion => {
+          const sexo = publicacion.user.sexo;
+          if (conteoPorSexo.hasOwnProperty(sexo)) {
+              conteoPorSexo[sexo]++;
+          }
+      });
+
+      conteoChazas.push({ 
+          nombreChaza: chaza.nombre,
+          conteoPorSexo 
+      });
+  });
+
+  res.status(200).json({
+      status: 'success',
+      data: {
+          conteoChazas
+      }
+  });
+});
+
+exports.agePubliStats = catchAsync(async (req, res, next) => {
+  if (req.user.nivelSuscripcion == 0) 
+      return next(new AppError("Si deseas ver estadisticas de tus chazas, por favor adquiere el plan especial", 403));
+
+  const misChazas = await Chaza.find({ propietarios: req.user.id });
+
+  if (!misChazas.length) {
+      return next(new AppError('No se encontraron chazas para este usuario.', 404));
+  }
+
+  const conteoChazas = await Promise.all(misChazas.map(async chaza => {
+    const estadisticas = await Publication.aggregate([
+      { $match: { chaza: chaza._id } },
+      {
+        $lookup: {
+          from: 'usuarios',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'userData'
+        }
+      },
+      { $unwind: '$userData' },
+      {
+        $project: {
+          "userData.fechaNacimiento": 1
+        }
+      },
+      {
+        $addFields: {
+          "userEdad": {
+            $subtract: [
+              { $year: new Date() },
+              { $year: "$userData.fechaNacimiento" }
+            ]
+          }
+        }
+      },
+      {
+        $bucket: {
+          groupBy: "$userEdad", // Campo por el cual agrupar
+          boundaries: [0, 18, 30, 45, 60, 75, 90], // Define tus rangos de edad
+          default: "90+", // Para edades superiores al último límite
+          output: {
+            count: { $sum: 1 }
+          }
+        }
+      }
+    ]);
+    return { 
+      nombreChaza: chaza.nombre,
+      estadisticas 
+    };
+    }));
+
+  console.log(conteoChazas);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      conteoChazas
     }
   });
 });

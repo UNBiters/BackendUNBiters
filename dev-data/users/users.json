@@ -1,15 +1,137 @@
-[{"nombre":"Garwood Benit","correo":"gbenit0@bloglines.com","rol":"usuario","contraseña":"yR9(HBP.}","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":false},
-{"nombre":"Devan Brodie","correo":"dbrodie1@bloglines.com","rol":"chazaUser","contraseña":"bG9(%sQGK","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":false},
-{"nombre":"Dyann Raith","correo":"draith2@ustream.tv","rol":"usuario","contraseña":"zP5\\!e06hD+&<(J{","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":false},
-{"nombre":"Forbes Ivory","correo":"fivory3@springer.com","rol":"usuario","contraseña":"iP6|5+vqnP_B","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":true},
-{"nombre":"Sharona Eldrid","correo":"seldrid4@ezinearticles.com","rol":"usuario","contraseña":"dS9#k4\"&!","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":false},
-{"nombre":"Terry Mark","correo":"tmark5@unesco.org","rol":"usuario","contraseña":"qE9(E&,#wQ","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":false},
-{"nombre":"Leslie Dignam","correo":"ldignam6@vimeo.com","rol":"usuario","contraseña":"jF6*0xzamy=","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":false},
-{"nombre":"Domini Brunning","correo":"dbrunning7@pcworld.com","rol":"usuario","contraseña":"aJ2_#&CM\"y>","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":true},
-{"nombre":"Leta Shard","correo":"lshard8@comcast.net","rol":"usuario","contraseña":"sJ4\\Y?6\\z","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":false},
-{"nombre":"Annabella Wisden","correo":"awisden9@nba.com","rol":"chazaUser","contraseña":"wX9(XNHe","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":false},
-{"nombre":"Dita Sarre","correo":"dsarrea@nasa.gov","rol":"usuario","contraseña":"fX9\",rnpOXMe","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":false},
-{"nombre":"Florencia Ubach","correo":"fubachb@ucoz.com","rol":"usuario","contraseña":"aA7*`2V7","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":true},
-{"nombre":"Sayers Crossgrove","correo":"scrossgrovec@mysql.com","rol":"chazaUser","contraseña":"rB9+S!Rs@X*dN5","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":true},
-{"nombre":"Flora Pickhaver","correo":"fpickhaverd@princeton.edu","rol":"usuario","contraseña":"jU6,vB/61a'8=","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":false},
-{"nombre":"Corliss Weatherhogg","correo":"cweatherhogge@ibm.com","rol":"chazaUser","contraseña":"qS0$0`m{k","confirmarContraseña":{"fields":[{"name":"contraseña","type":"String"},{"name":"confirmarCOntraseña","formula":"field['contraseña']"}]},"chaza":false}]
+[
+    {
+        "nombre": "Diego Jimenez",
+        "correo": "diegojimenez66@unal.edu.co",
+        "sexo": "M",
+        "fechaNacimiento": "1978-06-01",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": false
+    },
+    {
+        "nombre": "Diego Martinez",
+        "correo": "diegomartinez57@unal.edu.co",
+        "sexo": "M",
+        "fechaNacimiento": "1992-03-17",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": true
+    },
+    {
+        "nombre": "Elena Gomez",
+        "correo": "elenagomez23@unal.edu.co",
+        "sexo": "Otro",
+        "fechaNacimiento": "1937-10-24",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": true
+    },
+    {
+        "nombre": "Diego Lopez",
+        "correo": "diegolopez1@unal.edu.co",
+        "sexo": "F",
+        "fechaNacimiento": "2011-07-27",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": true
+    },
+    {
+        "nombre": "Juan Perez",
+        "correo": "juanperez74@unal.edu.co",
+        "sexo": "Otro",
+        "fechaNacimiento": "1928-03-31",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": false
+    },
+    {
+        "nombre": "Laura Perez",
+        "correo": "lauraperez96@gmail.com",
+        "sexo": "F",
+        "fechaNacimiento": "1997-12-29",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": false
+    },
+    {
+        "nombre": "Juan Garcia",
+        "correo": "juangarcia61@unal.edu.co",
+        "sexo": "M",
+        "fechaNacimiento": "2001-10-24",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": false
+    },
+    {
+        "nombre": "Laura Hernandez",
+        "correo": "laurahernandez34@gmail.com",
+        "sexo": "Otro",
+        "fechaNacimiento": "2008-10-19",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": false
+    },
+    {
+        "nombre": "Gabriel Hernandez",
+        "correo": "gabrielhernandez54@unal.edu.co",
+        "sexo": "Otro",
+        "fechaNacimiento": "1943-04-26",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": true
+    },
+    {
+        "nombre": "Ana Hernandez",
+        "correo": "anahernandez56@gmail.com",
+        "sexo": "M",
+        "fechaNacimiento": "2007-02-13",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": false
+    },
+    {
+        "nombre": "Ana Rodriguez",
+        "correo": "anarodriguez89@gmail.com",
+        "sexo": "Otro",
+        "fechaNacimiento": "1979-12-23",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": true
+    },
+    {
+        "nombre": "Gabriel Lopez",
+        "correo": "gabriellopez76@gmail.com",
+        "sexo": "Otro",
+        "fechaNacimiento": "1989-12-17",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": true
+    },
+    {
+        "nombre": "Gabriel Gomez",
+        "correo": "gabrielgomez21@unal.edu.co",
+        "sexo": "Otro",
+        "fechaNacimiento": "2009-09-28",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": true
+    },
+    {
+        "nombre": "Diego Martinez",
+        "correo": "diegomartinez63@unal.edu.co",
+        "sexo": "F",
+        "fechaNacimiento": "1959-04-08",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": true
+    },
+    {
+        "nombre": "Carlos Hernandez",
+        "correo": "carloshernandez42@unal.edu.co",
+        "sexo": "F",
+        "fechaNacimiento": "2010-11-03",
+        "contraseña": "12345678",
+        "confirmarContraseña": "12345678",
+        "chaza": true
+    }
+]

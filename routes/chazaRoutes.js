@@ -22,14 +22,14 @@ router
   .route('/myChaza')
   .get(
     authController.protect,
-    authController.restrictTo('chazaUser', 'admin'),
+    //authController.restrictTo('chazaUser', 'admin'),
     chazaController.getMyChazas);
 
 router.route('/updateMyChaza/:id')
   .patch(
     authController.protect,
-    //authController.restrictTo('chazaUser'),
-    chazaController.uploadChazaImages,
+    authController.restrictTo('chazaUser'),
+    chazaController.uploadChazaImage,
     //chazaController.resizeChazaImages,
     chazaController.updateMyChaza);
 
@@ -49,6 +49,7 @@ router
   .post(
     authController.protect,
     authController.restrictTo('admin', 'chazaUser'),
+    chazaController.uploadChazaImage,
     chazaController.setUserChaza,
     chazaController.createChaza);
 

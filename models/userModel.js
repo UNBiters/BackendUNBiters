@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const AppError = require('../utils/appError');
 
 const userSchema = new mongoose.Schema({
     nombre: {
@@ -14,6 +15,10 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
         validate: [validator.isEmail, 'Por favor dinos tu correo valido']
+    },
+    sexo: {
+      type: String,
+      enum: ["M", "F", "Otro"]
     },
     foto: {
         type: String,
@@ -41,6 +46,9 @@ const userSchema = new mongoose.Schema({
         message: 'Las contraseñas no coinciden!'
         }
     },
+    fechaNacimiento: {
+      type: Date
+    }, 
     chaza: Boolean,
     passwordChangedAt: Date,
     passwordResetToken: String,
@@ -50,11 +58,30 @@ const userSchema = new mongoose.Schema({
         default: true,
         select: false
     },
+    cliente: {
+      type: Boolean,
+      default: false
+    },
     nivelSuscripcion: {
       type: Number,
       default: 0
     }
-}, {timestamps: true});
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }, 
+  timestamps: true
+});
+
+userSchema.statics.calcAge = function(birthDate) {
+      const hoy = new Date();
+      const fechaNacimiento = new Date(birthDate);
+      let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+      const m = hoy.getMonth() - fechaNacimiento.getMonth();
+      if (m < 0 || (m === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+          edad--;
+      }
+      return edad;
+}
 
 userSchema.pre('save', async function(next) {
   // Only run this function if password was actually modified
@@ -65,6 +92,23 @@ userSchema.pre('save', async function(next) {
 
   // Delete passwordConfirm field
   this.confirmarContraseña = undefined;
+  next();
+});
+
+userSchema.virtual('edad').get(function () {
+  if (this.fechaNacimiento) {
+      return this.constructor.calcAge(this.fechaNacimiento);
+  }
+  return null;
+});
+
+userSchema.pre('save', function(next) {
+  if (this.fechaNacimiento) {
+      const edad = this.constructor.calcAge(this.fechaNacimiento);
+      if (edad < 12) {
+          return next(new AppError('Debes tener al menos 12 años.', 403));
+      }
+  }
   next();
 });
 

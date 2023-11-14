@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const User = require('./userModel');
 
 const customerSchema = new mongoose.Schema({
     user: {
@@ -45,6 +46,11 @@ const customerSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
+customerSchema.post('save', async function(doc) {
+    await User.findByIdAndUpdate(doc.user, {
+        cliente: true
+    });
+});
 
 const Customer = mongoose.model('Customer', customerSchema);
 

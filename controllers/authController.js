@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('./../models/userModel');
+const Chaza = require('./../models/chazaModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const Email = require('./../utils/email');
@@ -23,7 +24,7 @@ const createSendToken = (user, statusCode, req, res) => {
     // secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
   }
   if (process.env.NODE_ENV.trim() == 'production') cookieOptions.secure = true;
-  res.cookie('jwt', token, cookieOptions);
+  // res.cookie('jwt', token, cookieOptions);
 
   // Remove password from output
   user.contraseña = undefined;
@@ -43,11 +44,13 @@ exports.signup = catchAsync(async (req, res, next) => {
     correo: req.body.correo,
     contraseña: req.body.contraseña,
     confirmarContraseña: req.body.confirmarContraseña,
+    fechaNacimiento: req.body.fechaNacimiento,
     chaza: req.body.chaza,
+    sexo: req.body.sexo,
     rol: req.body.chaza === true ? "chazaUser" : "usuario"
   });
 
-  const url = `${req.protocol}://${req.get('host')}/me`;
+  const url = `https://unbiters.vercel.app/unbiters/profile`;
   // console.log(url);
   // await new Email(newUser, url).sendWelcome();
   const subject = "Bienvenido a UNBiters";
@@ -70,7 +73,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(contraseña, user.contraseña))) {
     return next(new AppError('Correo o contraseña incorrecta', 401));
   }
-
+  
   // 3) If everything ok, send token to client
   createSendToken(user, 200, req, res);
 });
@@ -92,7 +95,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1]
   }
-   else if (req.cookies.jwt) {
+  else if (req.cookies.jwt) {
     token = req.cookies.jwt;
   }
 
@@ -174,6 +177,8 @@ exports.restrictTo = (...roles) => {
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on POSTed email
   const user = await User.findOne({ correo: req.body.correo });
+  console.log(user)
+  console.log(req.body)
   if (!user) {
     return next(new AppError('No existe ningún usuario asociado a ese correo', 404));
   }
@@ -184,9 +189,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // 3) Send it to user's email
   try {
-    const resetURL = `${req.protocol}://${req.get(
+    const resetURL = `http://localhost:3001/unbiters/help/reset-password/#${resetToken}`;
+    /*const resetURL = `${req.protocol}://${req.get(
       'host'
-    )}/api/v1/users/resetPassword/${resetToken}`;
+    )}/api/v1/users/resetPassword/${resetToken}`;*/
     // await new Email(user, resetURL).sendPasswordReset();
 
     const message = `¿Olvidaste tu contraseña? Actualiza tu contraseña en el siguiente link: ${resetURL}\nSi aun recuerdas tu contraseña, por favor ignora este correo!`;
@@ -224,6 +230,8 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     .update(req.params.token)
     .digest('hex');
 
+
+  console.log(req.params.token)
   const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() }

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const User = require('./userModel');
 
 const subscriptionModel = new mongoose.Schema({
     id_plan: {
@@ -48,7 +49,11 @@ const subscriptionModel = new mongoose.Schema({
     }
 }, {timestamps: true});
 
-
+subscriptionModel.post('save', async function(doc) {
+    await User.findByIdAndUpdate(doc.user, {
+        nivelSuscripcion: 1
+    });
+});
 
 const Subscription = mongoose.model('Subscription', subscriptionModel);
 

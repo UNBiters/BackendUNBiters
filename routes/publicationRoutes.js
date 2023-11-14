@@ -16,6 +16,16 @@ router.route('/searchPublication').post(searchController.searchPublication);
 // Ver mis publicaciones:
 router.get('/myPublications', authController.protect, publicationController.getMyPublications);
 
+router.get('/sexStats', 
+    authController.protect, 
+    authController.restrictTo('admin', 'chazaUser'),
+    publicationController.sexPubliStats);
+
+router.get('/ageStats',
+    authController.protect,
+    authController.restrictTo('admin', 'chazaUser'),
+    publicationController.agePubliStats);
+
 // router.use(authController.protect);
 
 router

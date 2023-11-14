@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Chaza = require('./chazaModel');
+const slugify = require('slugify');
 
 const publicationSchema = new mongoose.Schema(
   {
@@ -52,7 +53,8 @@ const publicationSchema = new mongoose.Schema(
     },
     tags: [{
         type: String
-    }]
+    }],
+    slug: String
   },
   {
     toJSON: { virtuals: true },
@@ -60,10 +62,12 @@ const publicationSchema = new mongoose.Schema(
   }
 );
 
+
+// Tiene que estar incluido fechaNacimiento para que haga el calculo de edad en el populate
 publicationSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'user',
-    select: 'nombre foto'
+    select: 'nombre foto sexo correo edad fechaNacimiento'
   });
   next();
 });
@@ -75,14 +79,38 @@ publicationSchema.virtual('reviews', {
     localField: '_id'
 });
 
+publicationSchema.statics.numPublicationsChaza = async function(nombreChaza) {
+    const numPublications = await mongoose.model('Publication').countDocuments({ slug: nombreChaza });
+    return await Chaza.findOneAndUpdate({ slug: nombreChaza }, { numPublications });  
+};
+
 publicationSchema.pre('save', async function(next) {
     if (!this.nombreChaza) return next();
-    const chazaId = await Chaza.findOne({nombre: this.nombreChaza}, '_id');
+    this.slug = slugify(this.nombreChaza, { lower: true });
+    const chazaId = await Chaza.findOne({ slug: this.slug }, '_id');
     if (chazaId) {
         this.chaza = chazaId.id
     } 
     next();
 });
+
+publicationSchema.pre(/^findOneAnd/, async function(next) {
+    const update = this.getUpdate();
+
+    // Solo aplica si 'nombreChaza' está en la actualización
+    if (!update || !update.nombreChaza) return next();
+    const slug = slugify(update.nombreChaza, { lower: true });
+    this.set({ slug: slug }); 
+
+    if (!update.$set) return next();
+    const chazaId = await Chaza.findOne({ slug: update.$set.slug }, '_id');
+    this.set({ chaza: chazaId });
+
+    // updateOne
+    
+    next();
+});
+
 
 publicationSchema.statics.calcAverageRatings = async function(chazaId) {
     if (!chazaId) return
@@ -98,6 +126,7 @@ publicationSchema.statics.calcAverageRatings = async function(chazaId) {
             }
         }
     ]);
+
     if (stats.length > 0) {
         await Chaza.findByIdAndUpdate(chazaId, {
         ratingsQuantity: stats[0].nRating,
@@ -111,9 +140,17 @@ publicationSchema.statics.calcAverageRatings = async function(chazaId) {
     }
 };
 
-publicationSchema.post('save', function() {
+
+publicationSchema.post('save', async function(doc, next) {
     // this points to current review
-    this.constructor.calcAverageRatings(this.chaza);
+    if (!doc) return next()
+    await doc.constructor.numPublicationsChaza(doc.slug);
+    await doc.constructor.calcAverageRatings(doc.chaza);
+
+    // Si no es nuevo significa que es una actualización.
+    // if (!doc.isNew) {
+    //     await doc.numPublicationsPerSex(doc.user);
+    // }
 });
 
 // publicationSchema.pre(/^findOneAnd/, async function(next) {
@@ -124,6 +161,7 @@ publicationSchema.post('save', function() {
 publicationSchema.post(/^findOneAnd/, async function(doc, next) {
     // await this.findOne(); does NOT work here, query has already executed
     if (!doc) return next()
+    await doc.constructor.numPublicationsChaza(doc.slug);
     await doc.constructor.calcAverageRatings(doc.chaza);
 });
 

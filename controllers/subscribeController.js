@@ -2,6 +2,7 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const Subscription = require('../models/subscriptionModel');
 const Customer = require('../models/customerModel');
+const User = require('../models/userModel');
 
 const epayco = require('epayco-sdk-node')({
     apiKey: process.env.EPAYCO_PUBLIC_KEY,
@@ -43,6 +44,9 @@ exports.subscribe = catchAsync(async (req, res, next) => {
     const subscription = await epayco.subscriptions.create(req.body);
     req.body.subscriptionId = subscription.id
     await Subscription.create(req.body);
+    await User.findByIdAndUpdate(req.user.id, {
+        nivelSuscripcion: 1
+    })
 
     res.status(201).json({
         status: 'success',
@@ -86,6 +90,9 @@ exports.getMySubscriptions = catchAsync(async (req, res, next) => {
 exports.cancelSubscription = catchAsync(async (req, res, next) => {
     const subscription = await epayco.subscriptions.cancel(req.params.id);
     await Subscription.findOneAndUpdate({user: req.user.id}, {status: 'cancelada'});
+    await User.findByIdAndUpdate(req.user.id, {
+        nivelSuscripcion: 0
+    })
     res.status(200).json({
         status: 'success',
         data: {
@@ -120,4 +127,4 @@ exports.paySubscription = catchAsync(async (req, res, next) => {
             subscription
         }
     });
-});
+}); 

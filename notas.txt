@@ -7,3 +7,5 @@ Implementar correos para los seguidores.
 Implementar las fotos de los productos de las chazas. 
 Implementar el calculo de numComentarios en las publicaciones. (Implementado)
 Implementar el cambio de fotos por indice sin que se reemplaze todo para los campos de fotos e imagenes en los productos de chazas.
+
+Se pueden actualizar las imagenes de las publicaciones, mirar filteredBody.
