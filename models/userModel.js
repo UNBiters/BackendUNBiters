@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
     contraseña: {
         type: String,
         required: [true, 'Por favor escribe una contraseña'],
-        minlength: 8,
+        minlength: [8, "La contraseña debe ser de mínimo 8 caracteres"],
         select: false
     },
     confirmarContraseña: {
