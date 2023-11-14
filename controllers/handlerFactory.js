@@ -61,7 +61,7 @@ exports.createOne = (Model, search = false) =>
             await fs.unlink(req.file.path);
         }
         //esto deber ir logica del frontend
-        if (req.body.tag) {
+        if (req.body.tags) {
             req.body.tags = JSON.parse(req.body.tags);
         }
 
