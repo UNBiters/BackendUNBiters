@@ -61,9 +61,9 @@ exports.createOne = (Model, search = false) =>
             await fs.unlink(req.file.path);
         }
         //esto deber ir logica del frontend
-        if (Model.modelName == "Publication") {
-            req.body.tags = JSON.parse(req.body.tags);
-        }
+        // if (Model.modelName == "Publication") {
+        //     req.body.tags = JSON.parse(req.body.tags);
+        // }
 
         const doc = await Model.create(req.body);
 

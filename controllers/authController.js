@@ -50,7 +50,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     rol: req.body.chaza === true ? "chazaUser" : "usuario"
   });
 
-  const url = `${req.protocol}://${req.get('host')}/me`;
+  const url = `https://unbiters.vercel.app/unbiters/profile`;
   // console.log(url);
   // await new Email(newUser, url).sendWelcome();
   const subject = "Bienvenido a UNBiters";
@@ -177,6 +177,8 @@ exports.restrictTo = (...roles) => {
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on POSTed email
   const user = await User.findOne({ correo: req.body.correo });
+  console.log(user)
+  console.log(req.body)
   if (!user) {
     return next(new AppError('No existe ningún usuario asociado a ese correo', 404));
   }

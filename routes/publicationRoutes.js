@@ -21,6 +21,11 @@ router.get('/sexStats',
     authController.restrictTo('admin', 'chazaUser'),
     publicationController.sexPubliStats);
 
+router.get('/ageStats',
+    authController.protect,
+    authController.restrictTo('admin', 'chazaUser'),
+    publicationController.agePubliStats);
+
 // router.use(authController.protect);
 
 router

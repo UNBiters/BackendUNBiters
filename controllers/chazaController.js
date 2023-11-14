@@ -210,7 +210,7 @@ exports.updateChaza = factory.updateOne(Chaza);
 exports.deleteChaza = factory.deleteOne(Chaza);
 
 exports.getMyChazas = catchAsync(async (req, res, next) => {
-    const myChaza = await Chaza.find({ propietarios: req.user.id });
+    const myChaza = await Chaza.find({ propietarios: req.user.id }).populate({ path: "publications" });
     if (!myChaza) {
         return next(
             new AppError("No se encontro la chaza asociada a este usuario!", 404)

@@ -44,6 +44,9 @@ exports.subscribe = catchAsync(async (req, res, next) => {
     const subscription = await epayco.subscriptions.create(req.body);
     req.body.subscriptionId = subscription.id
     await Subscription.create(req.body);
+    await User.findByIdAndUpdate(req.user.id, {
+        nivelSuscripcion: 1
+    })
 
     res.status(201).json({
         status: 'success',
@@ -124,4 +127,4 @@ exports.paySubscription = catchAsync(async (req, res, next) => {
             subscription
         }
     });
-});
+}); 

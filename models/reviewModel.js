@@ -7,10 +7,6 @@ const reviewSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Por favor escribe un comentario antes de publicarlo']
     },
-    createdAt: {
-      type: Date,
-      default: Date.now
-    },
     publication: {
       type: mongoose.Schema.ObjectId,
       ref: 'Publication',
@@ -24,7 +20,8 @@ const reviewSchema = new mongoose.Schema(
   },
   {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
+    timestamps: true
   }
 );
 

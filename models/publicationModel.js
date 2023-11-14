@@ -62,10 +62,12 @@ const publicationSchema = new mongoose.Schema(
   }
 );
 
+
+// Tiene que estar incluido fechaNacimiento para que haga el calculo de edad en el populate
 publicationSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'user',
-    select: 'nombre foto sexo correo'
+    select: 'nombre foto sexo correo edad fechaNacimiento'
   });
   next();
 });
@@ -83,8 +85,8 @@ publicationSchema.statics.numPublicationsChaza = async function(nombreChaza) {
 };
 
 publicationSchema.pre('save', async function(next) {
-    this.slug = slugify(this.nombreChaza, { lower: true });
     if (!this.nombreChaza) return next();
+    this.slug = slugify(this.nombreChaza, { lower: true });
     const chazaId = await Chaza.findOne({ slug: this.slug }, '_id');
     if (chazaId) {
         this.chaza = chazaId.id

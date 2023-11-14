@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
   },
 });
 const multerFilter = (req, file, cb) => {
-  console.log(file)
+  // console.log(file)
   if (file.mimetype.startsWith('image')) {
     cb(null, true)
   } else {
@@ -84,8 +84,6 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
   const updatedPublication = await Publication.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, filteredBody, {
     runValidators: true
   });
-
-  console.log(updatedPublication)
   
   if (!currentPublication) {
     return next(new AppError("No se encontro la publicación buscada por este usuario", 404));
@@ -156,8 +154,6 @@ exports.sexPubliStats = catchAsync(async (req, res, next) => {
       });
   });
 
-  console.log(conteoChazas);
-
   res.status(200).json({
       status: 'success',
       data: {
@@ -166,4 +162,67 @@ exports.sexPubliStats = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.agePubliStats = catchAsync(async (req, res, next) => {
+  if (req.user.nivelSuscripcion == 0) 
+      return next(new AppError("Si deseas ver estadisticas de tus chazas, por favor adquiere el plan especial", 403));
+
+  const misChazas = await Chaza.find({ propietarios: req.user.id });
+
+  if (!misChazas.length) {
+      return next(new AppError('No se encontraron chazas para este usuario.', 404));
+  }
+
+  const conteoChazas = await Promise.all(misChazas.map(async chaza => {
+    const estadisticas = await Publication.aggregate([
+      { $match: { chaza: chaza._id } },
+      {
+        $lookup: {
+          from: 'usuarios',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'userData'
+        }
+      },
+      { $unwind: '$userData' },
+      {
+        $project: {
+          "userData.fechaNacimiento": 1
+        }
+      },
+      {
+        $addFields: {
+          "userEdad": {
+            $subtract: [
+              { $year: new Date() },
+              { $year: "$userData.fechaNacimiento" }
+            ]
+          }
+        }
+      },
+      {
+        $bucket: {
+          groupBy: "$userEdad", // Campo por el cual agrupar
+          boundaries: [0, 18, 30, 45, 60, 75, 90], // Define tus rangos de edad
+          default: "90+", // Para edades superiores al último límite
+          output: {
+            count: { $sum: 1 }
+          }
+        }
+      }
+    ]);
+    return { 
+      nombreChaza: chaza.nombre,
+      estadisticas 
+    };
+    }));
+
+  console.log(conteoChazas);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      conteoChazas
+    }
+  });
+});
 
