@@ -8,7 +8,8 @@ const handleCastErrorDB = err => {
 
 const handleDuplicateFieldsDB = err => {
   // const value = err.message.match(/(["'])(\\?.)*?\1/)[0];
-  const value = err.keyValue.nombre;
+  console.log(err)
+  const value = Object.keys(err.keyValue);
   const message = `El campo: ${value} ya existe. Por favor usa otro valor!`;
   return new AppError(message, 400);
 };
@@ -51,7 +52,7 @@ const sendErrorProd = (err, req, res) => {
     }
     // B) Programming or other unknown error: don't leak error details
     // 1) Log error
-    console.error('ERROR 💥', err);
+    // console.error('ERROR 💥', err);
     // 2) Send generic message
     return res.status(500).json({
       status: 'error',
@@ -71,17 +72,26 @@ module.exports = (err, req, res, next) => {
     let error = { ...err };
     error.message = err.message; 
     // console.log(error.reason?.name)
-    // console.log(error.message)
+    console.log(error._message)
 
     if (error.reason?.name === "AssertionError") error = handleCastErrorDB(error);
     if (error.reason?.name === "CastError") error = handleCastErrorDB(error);
     // if (error.reason && error.reason instanceof mongoose.Error.CastError) error = handleCastErrorDB(error)
     if (error.reason?.name === "BSONError") error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-    if (error._message === 'Validation failed')
+    if (error._message === 'Validation failed' 
+    || error._message === 'User validation failed' 
+    || error._message === "Chaza validation failed"
+    || error._message === "Publication validation failed"
+    || error._message === "Customer validation failed"
+    || error._message === "Plan validation failed"
+    || error._message === "Review validation failed"
+    || error._message === "Subscription validation failed")
       error = handleValidationErrorDB(error);
     if (error.name === 'JsonWebTokenError') error = handleJWTError();
     if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
+
+
     sendErrorProd(error, req, res);
   }
 };

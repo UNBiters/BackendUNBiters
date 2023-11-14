@@ -41,6 +41,7 @@ exports.subscribe = catchAsync(async (req, res, next) => {
     if (mySub.status == 'activa' || mySub.status == 'inactiva') {
         return new AppError('Ya esta en un plan, cancela la suscripción si quieres suscribirte a nuevos planes', 400);
     }
+
     const subscription = await epayco.subscriptions.create(req.body);
     req.body.subscriptionId = subscription.id
     await Subscription.create(req.body);
