@@ -36,7 +36,7 @@ router.route('/updateMyChaza/:id')
 router
   .route('/deleteMyChaza/:id')
   .delete(authController.protect,
-    authController.restrictTo('chazaUser'),
+    //authController.restrictTo('chazaUser'),
     chazaController.deleteMyChaza);
 
 router
