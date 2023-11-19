@@ -4,6 +4,7 @@ const AppError = require('./../utils/appError');
 const factory = require('./handlerFactory');
 const multer = require('multer');
 const sharp = require('sharp');
+const path = require("path");
 
 // const multerStorage = multer.diskStorage({
 //   destination: (req, file, cb) => {
@@ -16,22 +17,31 @@ const sharp = require('sharp');
 //   }
 // });
 
-const multerStorage = multer.memoryStorage();
 
+const storage = multer.diskStorage({
+  destination: path.join("/tmp"),
+  filename: function (req, file, cb) {
+      cb(null, `chaza-${req.user.id}-${Date.now()}.jpeg`);
+  },
+});
 const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true)
+  console.log(file);
+  if (file.mimetype.startsWith("image")) {
+      cb(null, true);
   } else {
-    cb(new AppError('El archivo no es una imagen! Por favor sube una imagen', 400), false);
+      cb(
+          new AppError("El archivo no es una imagen! Por favor sube una imagen", 400),
+          false
+      );
   }
 };
 
 const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter
+  storage: storage,
+  fileFilter: multerFilter,
 });
 
-exports.uploadUSerPhoto = upload.single('foto');
+exports.uploadUSerPhoto = upload.single("imagen");
 
 exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();

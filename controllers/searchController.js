@@ -29,12 +29,12 @@ exports.searchChaza = catchAsync(async (req, res, next) => {
 });
 
 exports.searchPublication = catchAsync(async (req, res, next) => {
-    //const publication = await indexPublication.search(req.body.filter);
-    Publication.createIndexes({ texto: 'text' });
+    const publications = await indexPublication.search(req.body.filter);
+    /*Publication.createIndexes({ texto: 'text' });
         var publications = await Publication.find(
             { $text: { $search: req.body.filter } },
             { score: { $meta: 'textScore' } }
-        ).sort({ score: { $meta: 'textScore' } });
+        ).sort({ score: { $meta: 'textScore' } });*/
         //console.log(publications);
         res.status(200).json({
             status: "success",

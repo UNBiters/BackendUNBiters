@@ -57,7 +57,7 @@ exports.updateOne = (Model) =>
 
 exports.createOne = (Model, search = false) =>
     catchAsync(async (req, res, next) => {
-        
+        console.log(req.body)
 
         if (req.file) {
             const result = await cloudinary.v2.uploader.upload(req.file.path);
@@ -66,9 +66,18 @@ exports.createOne = (Model, search = false) =>
             req.body.imagenId = result.public_id;
             await fs.unlink(req.file.path);
         }
-        //esto deber ir logica del frontend
-        if (req.body.tag) {
+    
+        if (req.body.nombre) {
+            req.body.slug = slugify(req.body.nombre, { lower: true });
+        }
+        if (req.body.tags) {
             req.body.tags = JSON.parse(req.body.tags);
+        }
+        if (req.body.horarioAtencion) {
+            req.body.horarioAtencion = JSON.parse(req.body.horarioAtencion);
+        }
+        if (req.body.mediosPagos) {
+            req.body.mediosPagos = JSON.parse(req.body.mediosPagos);
         }
 
         const doc = await Model.create(req.body);
