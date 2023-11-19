@@ -66,7 +66,6 @@ exports.createOne = (Model, search = false) =>
             req.body.imagenId = result.public_id;
             await fs.unlink(req.file.path);
         }
-    
         if (req.body.nombre) {
             req.body.slug = slugify(req.body.nombre, { lower: true });
         }
