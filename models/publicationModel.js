@@ -62,6 +62,7 @@ const publicationSchema = new mongoose.Schema(
   }
 );
 
+publicationSchema.index({'$**': 'text'});
 
 // Tiene que estar incluido fechaNacimiento para que haga el calculo de edad en el populate
 publicationSchema.pre(/^find/, function(next) {
