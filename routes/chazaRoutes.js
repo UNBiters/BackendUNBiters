@@ -28,7 +28,7 @@ router
 router.route('/updateMyChaza/:id')
   .patch(
     authController.protect,
-    authController.restrictTo('chazaUser'),
+    //authController.restrictTo('chazaUser'),
     chazaController.uploadChazaImage,
     //chazaController.resizeChazaImages,
     chazaController.updateMyChaza);
@@ -36,19 +36,19 @@ router.route('/updateMyChaza/:id')
 router
   .route('/deleteMyChaza/:id')
   .delete(authController.protect,
-    //authController.restrictTo('chazaUser'),
+    authController.restrictTo('admin', 'chazaUser'),
     chazaController.deleteMyChaza);
 
 router
   .route('/every')
   .get(chazaController.getAllChazasNames)
-  
+
 router
   .route('/')
   .get(chazaController.getAllChazas)
   .post(
     authController.protect,
-    authController.restrictTo('admin', 'chazaUser'),
+    //authController.restrictTo('admin', 'chazaUser'),
     chazaController.uploadChazaImage,
     chazaController.setUserChaza,
     chazaController.createChaza);

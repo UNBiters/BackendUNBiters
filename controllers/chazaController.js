@@ -8,6 +8,7 @@ const slugify = require("slugify");
 const path = require("path");
 const cloudinary = require("cloudinary");
 const fs = require("fs-extra");
+const searchController = require("./searchController");
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -100,7 +101,6 @@ exports.resizeChazaImages = catchAsync(async (req, res, next) => {
 });
 
 exports.updateMyChaza = catchAsync(async (req, res, next) => {
-    console.log("body", req.body);
     // El siguiente código reemplaza las imagenes que se encuentren en los campos de imagenes y borra todas las anteriores que se tenian.
 
     if (req.file) {
@@ -133,6 +133,8 @@ exports.updateMyChaza = catchAsync(async (req, res, next) => {
             new AppError("No se encontro una chaza asociada a este usuario", 404)
         );
     }
+    await searchController.updateDocuments("Chaza", req.params.id, req.body);
+
     res.status(200).json({
         status: "success",
         data: {
@@ -146,8 +148,10 @@ exports.deleteMyChaza = catchAsync(async (req, res, next) => {
     if (!deletedChaza) {
         return next(
             new AppError("No se encontro una chaza asociada a este usuario", 404)
-        );
-    }
+            );
+        }
+    await searchController.deleteDocuments("Chaza", req.params.id);
+
     res.status(204).json({
         status: "success",
         data: null,

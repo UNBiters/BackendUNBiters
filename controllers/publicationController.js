@@ -6,6 +6,7 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const slugify = require('slugify');
 const Chaza = require('../models/chazaModel');
+const searchController = require('./searchController');
 
 const path = require('path');
 const multerStorage = multer.memoryStorage();
@@ -88,6 +89,7 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
   if (!currentPublication) {
     return next(new AppError("No se encontro la publicación buscada por este usuario", 404));
   }
+  await searchController.updateDocuments("Publication", req.params.id, req.body);
 
 
   const slug = slugify(currentPublication.nombreChaza, {lower: true});
@@ -111,6 +113,8 @@ exports.deleteMyPublication = catchAsync(async (req, res, next) => {
   if (!deletedPublication) {
     return next(new AppError('No se encontro una publicación asociada a este usuario', 404));
   }
+  await searchController.deleteDocuments("Publication", req.params.id);
+
 
   res.status(204).json({
     status: 'success',

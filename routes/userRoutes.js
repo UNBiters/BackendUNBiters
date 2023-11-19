@@ -19,7 +19,7 @@ router.get('/me', userController.getMe, userController.getUser);
 router.patch(
   '/updateMe',
   userController.uploadUSerPhoto,
-  userController.resizeUserPhoto,
+  //userController.resizeUserPhoto,
   userController.updateMe
 );
 router.patch('/deleteMe', userController.deleteMe);
