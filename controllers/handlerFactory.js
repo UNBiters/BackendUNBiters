@@ -15,10 +15,13 @@ cloudinary.config({
 exports.deleteOne = (Model) =>
     catchAsync(async (req, res, next) => {
         const doc = await Model.findByIdAndDelete(req.params.id);
-
+        
         if (!doc) {
-            return next(new AppError("No document found with that ID", 404));
+            return next(new AppError("No se encontro ningun documento asociado al ID dado", 404));
         }
+
+        if (search && Model.modelName == "Chaza") searchController.deleteDocuments("Chaza", req.params.id);
+        if (search && Model.modelName == "Publication") searchController.deleteDocuments("Publication", req.params.id);
 
         res.status(204).json({
             status: "success",
@@ -34,8 +37,11 @@ exports.updateOne = (Model) =>
         });
 
         if (!doc) {
-            return next(new AppError("No document found with that ID", 404));
+            return next(new AppError("No se encontro ningun documento asociado al ID dado", 404));
         }
+
+        if (search && Model.modelName == "Chaza") searchController.updateDocuments("Chaza", req.params.id, req.body);
+        if (search && Model.modelName == "Publication") searchController.updateDocuments("Publication", req.params.id, req.body);
 
         if (req.body.nombre && Model.modelName == "Chaza") {
             doc.slug = slugify(String(req.body.nombre), { lower: true });

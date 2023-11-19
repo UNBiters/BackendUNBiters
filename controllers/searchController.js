@@ -1,5 +1,6 @@
 const algoliasearch = require('algoliasearch');
 const catchAsync = require('./../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 // Connect and authenticate with your Algolia app
 const client = algoliasearch(process.env.ALGOLIA_ID, process.env.ALGOLIA_ADMIN_API_KEY);
@@ -36,6 +37,58 @@ exports.searchPublication = catchAsync(async (req, res, next) => {
     });
 });
 
+exports.deleteDocuments = catchAsync(async (Model, mongoId) => {
+    try {
+        let searchResponse;
+        // Reemplaza 'mongodbId' con el id de MongoDB que quieres buscar
+        if (Model == "Chaza") searchResponse = await indexChaza.search(mongoId);
+        else if (Model == "Publication") searchResponse = await indexPublication.search(mongoId)
+
+        if (searchResponse.hits.length > 0) {
+            // Si se encuentra el hit, obtenemos el objectID
+            const object_id_to_delete = searchResponse.hits[0].objectID;
+            if (Model == "Chaza") await indexChaza.deleteObject(object_id_to_delete);
+            else if (Model == "Publication") await indexPublication.deleteObject(object_id_to_delete);
+        } else {
+            throw new AppError("No se encontro ningun documento asociado al id dado", 404);
+        }
+    } catch (err) {
+        console.error('Error al buscar o eliminar el documento:', err);
+    }
+    
+});
+
+exports.updateDocuments = catchAsync(async (Model, mongoId, updatedData) => {
+    try {
+        let searchResponse;
+        // Reemplaza 'mongodbId' con el id de MongoDB que quieres buscar
+        if (Model == "Chaza") searchResponse = await indexChaza.search(mongoId);
+        else if (Model == "Publication") searchResponse = await indexPublication.search(mongoId)
+
+        if (searchResponse.hits.length > 0) {
+            // Si se encuentra el hit, obtenemos el objectID
+            const object_id_to_update = searchResponse.hits[0].objectID;
+
+            // Actualiza el documento usando el objectID
+            if (Model == "Chaza") {
+                await indexChaza.partialUpdateObject({
+                    ...updatedData,
+                    objectID: object_id_to_update
+                });
+            } else if (Model == "Publication") {
+                await indexPublication.partialUpdateObject({
+                    ...updatedData,
+                    objectID: object_id_to_update
+                });
+            }
+
+        } else {
+            throw new AppError("No se encontro ningun documento asociado al id dado", 404);
+        }
+    } catch (err) {
+        console.error('Error al buscar o actualizar el documento:', err);
+    }
+})
 
 // (async() => {
 //     try {
