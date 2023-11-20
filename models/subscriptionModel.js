@@ -27,7 +27,8 @@ const subscriptionModel = new mongoose.Schema({
     },
     doc_number: {
         type: String,
-        required: [true, 'Por favor digite su número de documento']
+        required: [true, 'Por favor digite su número de documento'],
+        unique: true
     },
     url_confirmation: {
         type: String,

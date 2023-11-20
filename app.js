@@ -10,6 +10,12 @@ const cookieParser = require('cookie-parser');
 // const bodyParser = require('body-parser');
 const compression = require('compression');
 const cors = require('cors');
+const passport = require("passport");
+const expressSession = require("express-session");
+const MongoStore = require('connect-mongo');
+const LocalStrategy = require("passport-local").Strategy;
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const User = require('./models/userModel');
 
 
 const AppError = require('./utils/appError');
@@ -21,12 +27,85 @@ const subscriptionRouter = require('./routes/subscriptionRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const publicationRouter = require('./routes/publicationRoutes');
 const aboutusRouter = require('./routes/aboutusRouter');
+const oauthRouter = require('./routes/oauthRouter');
 // const viewRouter = require('./routes/viewRoutes');
 
 
 const app = express();
 
+const DB = process.env.DATABASE.replace(
+  '<PASSWORD>',
+  process.env.DATABASE_PASSWORD
+);
+
 // app.enable('trust proxy');
+
+app.use(
+  expressSession({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    name: "sessionID",
+    store: MongoStore.create({
+      mongoUrl: DB, // Replace with your MongoDB URL
+      collectionName: "sessions",
+    }),
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Secure cookies in production
+      maxAge: 1000 * 60 * 60 * 24, // e.g., 1 day
+    },
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.urlencoded({ extended: true }));
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL:
+        process.env.NODE_ENV === "production"
+          ? "https://unbiters.vercel.app/api/v1/oauth/google/callback"
+          : "http://localhost:3000/api/v1/oauth/google/callback",
+    },
+    async (accessToken, refreshToken, profile, done) => {      
+      try {
+        // Check if user exists in DB
+        let user = await User.findOne({ googleId: profile.id });
+
+        if (user) {
+          return done(null, user);
+        } else {
+          // Create new user
+          user = new User({
+            googleId: profile.id,
+            nombre: profile.displayName,
+            correo: profile._json.email,
+          });
+          await user.save({validateBeforeSave: false});
+          return done(null, user);
+        }
+      } catch (err) {
+        return done(err);
+      }
+    }
+  )
+);
+
+passport.use(new LocalStrategy(User.authenticate()));
+// passport.use(User.createStrategy());
+// passport.serializeUser(User.serializeUser());
+passport.serializeUser((user, done) => {
+  console.log('Serializando usuario:', user);
+  done(null, user._id);
+});
+
+passport.deserializeUser(User.deserializeUser());
+
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
@@ -96,7 +175,7 @@ app.use('/api/v1/payment', subscriptionRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/publications', publicationRouter);
 app.use('/api/v1/aboutus', aboutusRouter);
-
+app.use('/api/v1/oauth', oauthRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`No se pudo encontrar ${req.originalUrl} en este servidor!`, 404));

@@ -36,13 +36,15 @@ const customerSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Por favor, ingrese un número de teléfono.'],
         trim: true,
-        match: [/^\d{7,10}$/, 'Por favor, ingrese un número de teléfono válido.']
+        match: [/^\d{7,10}$/, 'Por favor, ingrese un número de teléfono válido.'],
+        unique: true
     },
     cell_phone: {
         type: String,
         required: [true, 'Por favor, ingrese un número de celular.'],
         trim: true,
-        match: [/^\d{10}$/, 'Por favor, ingrese un número de celular válido.']
+        match: [/^\d{10}$/, 'Por favor, ingrese un número de celular válido.'],
+        unique: true
     }
 }, {timestamps: true});
 

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const AppError = require('../utils/appError');
+const passportLocalMongoose = require('passport-local-mongoose');
 
 const userSchema = new mongoose.Schema({
     nombre: {
@@ -65,7 +66,8 @@ const userSchema = new mongoose.Schema({
     nivelSuscripcion: {
       type: Number,
       default: 0
-    }
+    },
+    googleId: String
 }, {
   toJSON: { virtuals: true },
   toObject: { virtuals: true }, 
@@ -157,6 +159,8 @@ userSchema.methods.createPasswordResetToken = function() {
   
     return resetToken;
 };
+
+userSchema.plugin(passportLocalMongoose);
 
 const User = mongoose.model('User', userSchema, "usuarios");
 module.exports = User;
