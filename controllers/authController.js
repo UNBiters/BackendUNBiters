@@ -189,8 +189,13 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // 3) Send it to user's email
   try {
-    if (process.env.NODE_ENV.trim() == 'production')  const resetURL = `https://unbiters.vercel.app/unbiters/help/reset-password/#${resetToken}`;
-    if (process.env.NODE_ENV.trim() == 'development') const resetURL = `http://localhost:3001/unbiters/help/reset-password/#${resetToken}`;
+    let resetUrl;
+    if (process.env.NODE_ENV.trim() == 'production') {
+      resetURL = `https://unbiters.vercel.app/unbiters/help/reset-password/#${resetToken}`;
+    }
+    if (process.env.NODE_ENV.trim() == 'development') {
+      resetURL = `http://localhost:3001/unbiters/help/reset-password/#${resetToken}`;
+    }
     
     /*const resetURL = `${req.protocol}://${req.get(
       'host'
