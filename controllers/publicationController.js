@@ -58,8 +58,8 @@ exports.getAllPublications = factory.getAll(Publication, { path: 'reviews' });
 exports.getPublication = factory.getOne(Publication, { path: 'reviews' });
 exports.getMePublications = factory.getOnes(Publication, "chaza", { path: 'reviews' });
 exports.createPublication = factory.createOne(Publication, true);
-exports.updatePublication = factory.updateOne(Publication);
-exports.deletePublication = factory.deleteOne(Publication);
+exports.updatePublication = factory.updateOne(Publication, true);
+exports.deletePublication = factory.deleteOne(Publication, true);
 
 exports.updateMyPublication = catchAsync(async (req, res, next) => {
 

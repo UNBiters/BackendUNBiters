@@ -210,8 +210,8 @@ exports.getAllChazasNames = factory.getAllNames(Chaza);
 exports.createChaza = factory.createOne(Chaza, true);
 
 // Do NOT update passwords with this!
-exports.updateChaza = factory.updateOne(Chaza);
-exports.deleteChaza = factory.deleteOne(Chaza);
+exports.updateChaza = factory.updateOne(Chaza, true);
+exports.deleteChaza = factory.deleteOne(Chaza, true);
 
 exports.getMyChazas = catchAsync(async (req, res, next) => {
     const myChaza = await Chaza.find({ propietarios: req.user.id }).populate({ path: "publications" });

@@ -12,10 +12,10 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-exports.deleteOne = (Model) =>
+exports.deleteOne = (Model, search = false) =>
     catchAsync(async (req, res, next) => {
         const doc = await Model.findByIdAndDelete(req.params.id);
-        
+        console.log(req.params.id)
         if (!doc) {
             return next(new AppError("No se encontro ningun documento asociado al ID dado", 404));
         }
@@ -29,7 +29,7 @@ exports.deleteOne = (Model) =>
         });
     });
 
-exports.updateOne = (Model) =>
+exports.updateOne = (Model, search = false) =>
     catchAsync(async (req, res, next) => {
         const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -96,7 +96,7 @@ exports.createOne = (Model, search = false) =>
 
 exports.getOne = (Model, popOptions) =>
     catchAsync(async (req, res, next) => {
-        console.log(req.params.id);
+        console.log(req.params.id, "HOLAAAA");
         let query = Model.findById(req.params.id);
         if (popOptions) query = query.populate(popOptions);
         const doc = await query;

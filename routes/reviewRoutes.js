@@ -15,7 +15,7 @@ router
   );
 
 router
-  .get('/myReviews', reviewController.getMyReviews)
+  .route('/myReviews').get(reviewController.getMyReviews);
 
 router
   .route('/:id')

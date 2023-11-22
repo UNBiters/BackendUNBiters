@@ -17,7 +17,7 @@ exports.updateReview = factory.updateOne(Review);
 exports.deleteReview = factory.deleteOne(Review);
 
 exports.getMyReviews = catchAsync(async (req, res, next) => {
-  console.log(req.user.id)
+  
   const reviews = await Review.find({ user: req.user.id }).populate({ path: 'user' });
   res.status(200).json({
     status: 'success',
