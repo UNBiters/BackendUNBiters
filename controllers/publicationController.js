@@ -62,7 +62,6 @@ exports.updatePublication = factory.updateOne(Publication, true);
 exports.deletePublication = factory.deleteOne(Publication, true);
 
 exports.updateMyPublication = catchAsync(async (req, res, next) => {
-
   const filteredBody = {
     user: req.user.id,
     texto: req.body.texto,
@@ -73,7 +72,7 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
   }
 
   //if (req.file) filteredBody.imagen = req.file.filename;
-  if (req.file && Model.modelName == "Publication") {
+  if (req.file) {
     const result = await cloudinary.v2.uploader.upload(req.file.path)
     //console.log(result)
     req.body.imagenUrl = result.secure_url;
