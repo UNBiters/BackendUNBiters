@@ -68,7 +68,7 @@ reviewSchema.post('save', function() {
 //   next();
 // });
 
-reviewSchema.post(/^findOneAndUpdate/, async function(doc) {
+reviewSchema.post(/^findOneAnd/, async function(doc) {
   // await this.findOne(); does NOT work here, query has already executed
   await doc.constructor.calcReviews(doc.publication);
 });
