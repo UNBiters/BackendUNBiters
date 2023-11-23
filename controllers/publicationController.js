@@ -8,6 +8,7 @@ const slugify = require('slugify');
 const Chaza = require('../models/chazaModel');
 const searchController = require('./searchController');
 
+const fs = require("fs-extra");
 const cloudinary = require("cloudinary");
 const path = require('path');
 const multerStorage = multer.memoryStorage();
@@ -76,30 +77,32 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
     nombreChaza: req.body.nombreChaza,
     rating: req.body.rating,
     chaza: req.body.chaza,
-    tags: req.body.tags
+    tags: JSON.parse(req.body.tags)
   }
 
   //if (req.file) filteredBody.imagen = req.file.filename;
-  if (req.file && Model.modelName == "Publication") {
+  if (req.file) {
     const result = await cloudinary.v2.uploader.upload(req.file.path)
     //console.log(result)
-    req.body.imagenUrl = result.secure_url;
-    req.body.imagenId = result.public_id;
+    filteredBody.imagenUrl = result.secure_url;
+    filteredBody.imagenId = result.public_id;
     await fs.unlink(req.file.path)
   }
 
   const currentPublication = await Publication.findOne({ _id: req.params.id, user: req.user.id });
-  const updatedPublication = await Publication.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, filteredBody, {
-    runValidators: true
-  });
   
   if (!currentPublication) {
     return next(new AppError("No se encontro la publicación buscada por este usuario", 404));
   }
+  const updatedPublication = await Publication.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, filteredBody, {
+    runValidators: true,
+    returnOriginal: false, returnDocument: "after"
+  });
+
   await searchController.updateDocuments("Publication", req.params.id, req.body);
 
 
-  const slug = slugify(currentPublication.nombreChaza, {lower: true});
+  const slug = slugify(currentPublication.nombreChaza, { lower: true });
   if (slug != updatedPublication.slug) {
     await Chaza.findOneAndUpdate({ slug }, { $inc: { numPublications: -1 } })
     // await Chaza.findOneAndUpdate({ slug: updatedPublication.slug }, { $inc: { numPublications: 1 } } )
@@ -116,7 +119,7 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteMyPublication = catchAsync(async (req, res, next) => {
-  const deletedPublication = await Publication.findOneAndDelete({ _id:req.params.id, user: req.user.id });
+  const deletedPublication = await Publication.findOneAndDelete({ _id: req.params.id, user: req.user.id });
   if (!deletedPublication) {
     return next(new AppError('No se encontro una publicación asociada a este usuario', 404));
   }
@@ -144,43 +147,43 @@ exports.sexPubliStats = catchAsync(async (req, res, next) => {
   const misChazas = await Chaza.find({ propietarios: req.user.id }).populate({ path: 'publications' });
 
   if (!misChazas.length) {
-      return next(new AppError('No se encontraron chazas para este usuario.', 404));
+    return next(new AppError('No se encontraron chazas para este usuario.', 404));
   }
 
   const conteoChazas = [];
 
   misChazas.forEach(chaza => {
-      const conteoPorSexo = { "M": 0, "F": 0, "Otro": 0 };
-      
-      chaza.publications.forEach(publicacion => {
-          const sexo = publicacion.user.sexo;
-          if (conteoPorSexo.hasOwnProperty(sexo)) {
-              conteoPorSexo[sexo]++;
-          }
-      });
+    const conteoPorSexo = { "M": 0, "F": 0, "Otro": 0 };
 
-      conteoChazas.push({ 
-          nombreChaza: chaza.nombre,
-          conteoPorSexo 
-      });
+    chaza.publications.forEach(publicacion => {
+      const sexo = publicacion.user.sexo;
+      if (conteoPorSexo.hasOwnProperty(sexo)) {
+        conteoPorSexo[sexo]++;
+      }
+    });
+
+    conteoChazas.push({
+      nombreChaza: chaza.nombre,
+      conteoPorSexo
+    });
   });
 
   res.status(200).json({
-      status: 'success',
-      data: {
-          conteoChazas
-      }
+    status: 'success',
+    data: {
+      conteoChazas
+    }
   });
 });
 
 exports.agePubliStats = catchAsync(async (req, res, next) => {
-  if (req.user.nivelSuscripcion == 0) 
-      return next(new AppError("Si deseas ver estadisticas de tus chazas, por favor adquiere el plan especial", 403));
+  if (req.user.nivelSuscripcion == 0)
+    return next(new AppError("Si deseas ver estadisticas de tus chazas, por favor adquiere el plan especial", 403));
 
   const misChazas = await Chaza.find({ propietarios: req.user.id });
 
   if (!misChazas.length) {
-      return next(new AppError('No se encontraron chazas para este usuario.', 404));
+    return next(new AppError('No se encontraron chazas para este usuario.', 404));
   }
 
   const conteoChazas = await Promise.all(misChazas.map(async chaza => {
@@ -221,11 +224,11 @@ exports.agePubliStats = catchAsync(async (req, res, next) => {
         }
       }
     ]);
-    return { 
+    return {
       nombreChaza: chaza.nombre,
-      estadisticas 
+      estadisticas
     };
-    }));
+  }));
 
   console.log(conteoChazas);
 
