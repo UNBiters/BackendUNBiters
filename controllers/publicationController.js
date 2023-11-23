@@ -80,6 +80,9 @@ exports.updateMyPublication = catchAsync(async (req, res, next) => {
     await fs.unlink(req.file.path)
   }
 
+  if (req.body.tags) {
+    req.body.tags = JSON.parse(req.body.tags);
+  }
   const currentPublication = await Publication.findOne({ _id: req.params.id, user: req.user.id });
   const updatedPublication = await Publication.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, filteredBody, {
     runValidators: true
