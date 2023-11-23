@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const User = require('./userModel');
+const AppError = require('../utils/appError');
 
 const customerSchema = new mongoose.Schema({
     user: {
@@ -47,6 +48,15 @@ const customerSchema = new mongoose.Schema({
         unique: true
     }
 }, {timestamps: true});
+
+customerSchema.pre("save", async function(next) {
+    const client = await User.findById(this.user);
+    if (client.chaza) {
+        next();
+    } else {
+        return next(new AppError("Para poder ser usuario premium debes ser propietario de una chaza", 403));
+    }
+})
 
 customerSchema.post('save', async function(doc) {
     await User.findByIdAndUpdate(doc.user, {
