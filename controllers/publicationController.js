@@ -8,8 +8,15 @@ const slugify = require('slugify');
 const Chaza = require('../models/chazaModel');
 const searchController = require('./searchController');
 
+const cloudinary = require("cloudinary");
 const path = require('path');
 const multerStorage = multer.memoryStorage();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const storage = multer.diskStorage({
   destination: path.join("/tmp"),
@@ -62,17 +69,18 @@ exports.updatePublication = factory.updateOne(Publication, true);
 exports.deletePublication = factory.deleteOne(Publication, true);
 
 exports.updateMyPublication = catchAsync(async (req, res, next) => {
+
   const filteredBody = {
     user: req.user.id,
     texto: req.body.texto,
     nombreChaza: req.body.nombreChaza,
     rating: req.body.rating,
     chaza: req.body.chaza,
-    tags: JSON.parse(req.body.tags)
+    tags: req.body.tags
   }
 
   //if (req.file) filteredBody.imagen = req.file.filename;
-  if (req.file) {
+  if (req.file && Model.modelName == "Publication") {
     const result = await cloudinary.v2.uploader.upload(req.file.path)
     //console.log(result)
     req.body.imagenUrl = result.secure_url;
