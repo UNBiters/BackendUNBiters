@@ -8,8 +8,15 @@ const slugify = require('slugify');
 const Chaza = require('../models/chazaModel');
 const searchController = require('./searchController');
 
+const cloudinary = require("cloudinary");
 const path = require('path');
 const multerStorage = multer.memoryStorage();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const storage = multer.diskStorage({
   destination: path.join("/tmp"),
