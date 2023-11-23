@@ -67,6 +67,12 @@ const userSchema = new mongoose.Schema({
       type: Number,
       default: 0
     },
+    imagenUrl: {
+        type: String,
+    },
+    imagenId: {
+        type: String,
+    },
     googleId: String
 }, {
   toJSON: { virtuals: true },

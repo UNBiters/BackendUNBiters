@@ -6,6 +6,8 @@ const multer = require('multer');
 const sharp = require('sharp');
 const path = require("path");
 
+const fs = require("fs-extra");
+const cloudinary = require("cloudinary");
 // const multerStorage = multer.diskStorage({
 //   destination: (req, file, cb) => {
 //     cb(null, 'public/img/users')
@@ -18,21 +20,26 @@ const path = require("path");
 // });
 
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 const storage = multer.diskStorage({
   destination: path.join("/tmp"),
   filename: function (req, file, cb) {
-      cb(null, `chaza-${req.user.id}-${Date.now()}.jpeg`);
+    cb(null, `user-${req.user.id}-${Date.now()}.jpeg`);
   },
 });
 const multerFilter = (req, file, cb) => {
   console.log(file);
   if (file.mimetype.startsWith("image")) {
-      cb(null, true);
+    cb(null, true);
   } else {
-      cb(
-          new AppError("El archivo no es una imagen! Por favor sube una imagen", 400),
-          false
-      );
+    cb(
+      new AppError("El archivo no es una imagen! Por favor sube una imagen", 400),
+      false
+    );
   }
 };
 
@@ -54,7 +61,7 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
     .jpeg({ quality: 90 })
     .toFile(`public/img/users/${req.file.filename}`);
 
-  next(); 
+  next();
 });
 
 const filterObj = (obj, ...allowedFields) => {
@@ -89,7 +96,13 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
   // 2) Filtered out unwanted fields names that are not allowed to be updated
   const filteredBody = filterObj(req.body, 'nombre', 'correo');
-  if (req.file) filteredBody.foto = req.file.filename;
+  if (req.file) {
+    const result = await cloudinary.v2.uploader.upload(req.file.path)
+    //console.log(result)
+    filteredBody.imagenUrl = result.secure_url;
+    filteredBody.imagenId = result.public_id;
+    await fs.unlink(req.file.path)
+  }
 
   // 3) Update user document
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
@@ -118,14 +131,14 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 
 
 exports.createUser = catchAsync(async (req, res, next) => {
-    const newUser = await User.create(req.body);
+  const newUser = await User.create(req.body);
 
-    res.status(201).json({
-        status: 'success',
-        data: {
-            user: newUser
-        }
-    });
+  res.status(201).json({
+    status: 'success',
+    data: {
+      user: newUser
+    }
+  });
 });
 
 exports.getUser = factory.getOne(User);
