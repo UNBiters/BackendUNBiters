@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 // const Chaza = require('./chazaModel');
 const Publication = require('./publicationModel');
+const searchController = require('../controllers/searchController');
 
 const likeSchema = new mongoose.Schema({
     // chaza: {
@@ -44,10 +45,12 @@ likeSchema.statics.calcLikes = async function(publicationId) {
     await Publication.findByIdAndUpdate(publicationId, {
       likes: stats[0].numLikes
     });
+    searchController.updateDocuments("Publication", publicationId, { likes: stats[0].numLikes })
   } else {
     await Publication.findByIdAndUpdate(publicationId, {
       likes: 0
     });
+    searchController.updateDocuments("Publication", publicationId, { likes: 0 })
   }
 };
 
