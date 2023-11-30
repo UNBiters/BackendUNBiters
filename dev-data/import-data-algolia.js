@@ -6,6 +6,12 @@ const dotenv = require('dotenv');
 
 const Chaza = require('../models/chazaModel');
 const Publication = require('../models/publicationModel');
+const Review = require('../models/reviewModel');
+const User = require('../models/userModel');
+const Like = require('../models/likeModel');
+const Customer = require('../models/customerModel');
+const Subscription = require('../models/subscriptionModel');
+const Plan = require('../models/planModel');
 
 dotenv.config({path: '../config.env'});
 
@@ -44,8 +50,7 @@ const updateAlgoliaIndex = catchAsync(async () => {
       console.log('Índice limpiado');
   
       // Recuperar documentos de MongoDB
-      const publications = await Publication.find({});
-  
+      const publications = await Publication.find({}).populate({ path: 'reviews' });
       // Cargar en Algolia
       loadDataToAlgolia(publications);
     } catch (err) {
